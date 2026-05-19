@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 京阪神和歌山 9天8夜探險之旅</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8fafc;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .itinerary-step::before {
+            content: '';
+            position: absolute;
+            left: 19px;
+            top: 30px;
+            height: calc(100% - 20px);
+            width: 2px;
+            background-color: #e2e8f0;
+        }
+        .itinerary-step:last-child::before {
+            display: none;
+        }
+        .checked-item {
+            text-decoration: line-through;
+            color: #94a3b8;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .main-tab-content {
+            display: none;
+        }
+        .main-tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tab-btn.active {
+            background-color: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+        }
+        .day-tab-btn.active {
+            background-color: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+        }
+        .map-link {
+            color: #1d4ed8;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+        }
+        .map-link:hover {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+        .hotel-card {
+            background: linear-gradient(to right, #f8fafc, #ffffff);
+            border-left: 4px solid #6366f1;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- Header -->
+    <header class="bg-indigo-700 text-white py-10 px-4 text-center shadow-lg">
+        <h1 class="text-3xl md:text-4xl font-bold mb-2">阪神和歌山大縱走</h1>
+        <p class="text-indigo-100 text-lg italic">9 天 8 夜 城市探險計畫</p>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-4 md:p-8 space-y-6">
+        
+        <!-- 快速概覽 -->
+        <section class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex justify-around items-center text-center">
+            <div>
+                <p class="text-xs text-slate-500 mb-1">主要城市</p>
+                <p class="font-bold text-blue-600">神戶/大阪/和歌山</p>
+            </div>
+            <div class="h-8 w-px bg-slate-200"></div>
+            <div>
+                <p class="text-xs text-slate-500 mb-1">總天數</p>
+                <p class="font-bold text-blue-600">9 Days</p>
+            </div>
+            <div class="h-8 w-px bg-slate-200"></div>
+            <div>
+                <p class="text-xs text-slate-500 mb-1">交通卡</p>
+                <p class="font-bold text-blue-600">suica</p>
+            </div>
+        </section>
+
+        <!-- 主分頁標籤 -->
+        <section class="sticky top-2 z-30">
+            <div class="flex overflow-x-auto no-scrollbar py-2 gap-2 bg-slate-50/80 backdrop-blur-md rounded-xl p-1 shadow-sm">
+                <button onclick="showMainTab('itinerary')" id="btn-main-itinerary" class="tab-btn active shrink-0 flex-1 px-5 py-2 rounded-lg border border-slate-200 bg-white font-bold transition-all text-sm"><i class="fas fa-calendar-alt mr-1"></i> 行程</button>
+                <button onclick="showMainTab('flight')" id="btn-main-flight" class="tab-btn shrink-0 flex-1 px-5 py-2 rounded-lg border border-slate-200 bg-white font-bold transition-all text-sm"><i class="fas fa-plane mr-1"></i> 飛機資訊</button>
+                <button onclick="showMainTab('cards')" id="btn-main-cards" class="tab-btn shrink-0 flex-1 px-5 py-2 rounded-lg border border-slate-200 bg-white font-bold transition-all text-sm"><i class="fas fa-credit-card mr-1"></i> 刷卡攻略</button>
+                <button onclick="showMainTab('vjw')" id="btn-main-vjw" class="tab-btn shrink-0 flex-1 px-5 py-2 rounded-lg border border-slate-200 bg-white font-bold transition-all text-sm"><i class="fas fa-qrcode mr-1"></i> VJW 資料</button>
+            </div>
+        </section>
+
+        <!-- 行程子分頁標籤 -->
+        <section id="day-tabs-section" class="sticky top-16 z-20 mt-2">
+            <div class="flex overflow-x-auto no-scrollbar py-2 gap-2 bg-slate-50/80 backdrop-blur-md rounded-xl p-1 shadow-sm">
+                <script>
+                    for (let i = 1; i <= 9; i++) {
+                        document.write(`<button onclick="showDayTab(${i})" id="btn-day-${i}" class="day-tab-btn ${i === 1 ? 'active' : ''} shrink-0 px-5 py-2 rounded-lg border border-slate-200 bg-white font-bold transition-all text-sm">Day ${i}</button>`);
+                    }
+                </script>
+            </div>
+        </section>
+
+        <!-- 行程詳細內容 -->
+        <section id="itinerary-container" class="bg-white rounded-2xl shadow-sm p-6 border border-slate-100 min-h-[400px]">
+            
+            <!-- 行程主分頁 -->
+            <div id="main-tab-itinerary" class="main-tab-content active">
+                <!-- Day 1 -->
+            <div id="tab-1" class="tab-content active">
+                <h3 class="text-xl font-bold text-blue-600 mb-6 flex items-center">
+                    <i class="fas fa-ship mr-2"></i> Day 1 | 7/18(六) 跨海抵達神戶
+                </h3>
+                <div class="relative ml-2 mb-8">
+                    <div class="itinerary-step relative pl-12 pb-8">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold z-10">01</span>
+                        <p class="text-sm text-slate-500 font-medium">12:00</p>
+                        <h4 class="text-lg font-bold"><a href="https://www.google.com/maps/search/KIX+關西國際機場" target="_blank" class="map-link">KIX 關西機場抵達 <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a></h4>
+                        <p class="text-slate-600">辦理入境與拿行李。</p>
+                    </div>
+                    <div class="itinerary-step relative pl-12 pb-8">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold z-10">02</span>
+                        <h4 class="text-lg font-bold">神戶高速船 Bay Shuttle</h4>
+                        <div class="bg-blue-50 p-3 rounded-lg mt-2 text-xs text-blue-800 border border-blue-100">
+                            <p class="font-bold mb-1"><i class="fas fa-clock mr-1"></i> <a href="https://www.kobe-access.jp/chi2/time.php" target="_blank" class="text-blue-600 hover:text-blue-800 underline">時刻表參考</a> (12:00 抵達建議)</p>
+                            <ul class="space-y-1">
+                                <li>• 接駁巴士：13:30 / 14:15</li>
+                                <li>• 船班時間：13:45 / 14:30</li>
+                                <li>• 抵達神戶：14:15 / 15:00</li>
+                            </ul>
+                        </div>
+                        <p class="text-slate-600 mt-2">外國遊客優惠僅 500 日圓，船程 30 分鐘。</p>
+                    </div>
+                    <div class="itinerary-step relative pl-12 pb-8">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold z-10">03</span>
+                        <h4 class="text-lg font-bold"><a href="https://www.google.com/maps/search/Hotel+Casabella+Inn+Kobe" target="_blank" class="map-link">前往飯店放行李 <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a></h4>
+                        <p class="text-slate-600">抵達神戶後前往飯店辦理入住並放置行李。</p>
+                    </div>
+                    <div class="itinerary-step relative pl-12">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold z-10">04</span>
+                        <h4 class="text-lg font-bold"><a href="https://www.google.com/maps/search/神戶港塔" target="_blank" class="map-link">神戶港塔 / UMIE <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a></h4>
+                        <p class="text-slate-600">放好行李後出發。體驗神戶港經典風景與晚餐。</p>
+                    </div>
+                </div>
+                <!-- 住宿區塊 -->
+                <div class="hotel-card p-4 rounded-xl border border-slate-100">
+                    <h5 class="text-sm font-bold text-indigo-600 mb-2 italic"><i class="fas fa-bed mr-2"></i>今晚住宿 (神戶)</h5>
+                    <p class="font-bold text-slate-800">Hotel Casabella Inn Kobe</p>
+                    <p class="text-xs text-slate-500 mt-1"><i class="fas fa-location-dot mr-1"></i> 650-0015 神戶市中央區多聞通 3-3-1</p>
+                    <a href="https://www.google.com/maps/search/Hotel+Casabella+Inn+Kobe" target="_blank" class="mt-2 text-xs text-blue-500 flex items-center"><i class="fas fa-directions mr-1"></i> 開啟地圖導航</a>
+                </div>
+            </div>
+
+            <!-- Day 2 -->
+            <div id="tab-2" class="tab-content">
+                <h3 class="text-xl font-bold text-blue-600 mb-6 flex items-center">
+                    <i class="fas fa-castle mr-2"></i> Day 2 | 7/19(日) 姬路國寶文化之旅
+                </h3>
+                <div class="relative ml-2 mb-8">
+                    <div class="itinerary-step relative pl-12 pb-8">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold z-10">01</span>
+                        <h4 class="text-lg font-bold"><a href="https://www.google.com/maps/search/姬路城" target="_blank" class="map-link">姬路城 <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a> & <a href="https://www.google.com/maps/search/好古園" target="_blank" class="map-link">好古園 <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a></h4>
+                        <p class="text-slate-600">參觀日本國寶級建築與美麗的日式庭園。</p>
+                    </div>
+                    <div class="itinerary-step relative pl-12">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold z-10">02</span>
+                        <h4 class="text-lg font-bold"><a href="https://www.google.com/maps/search/姬路本町商店街" target="_blank" class="map-link">本町商店街 & みゆき通 <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a></h4>
+                        <p class="text-slate-600">姬路站前兩大商店街，回程前逛街購買紀念品。</p>
+                    </div>
+                </div>
+                <div class="hotel-card p-4 rounded-xl border border-slate-100">
+                    <h5 class="text-sm font-bold text-indigo-600 mb-2 italic"><i class="fas fa-bed mr-2"></i>今晚住宿 (神戶)</h5>
+                    <p class="font-bold text-slate-800">Hotel Casabella Inn Kobe</p>
+                    <p class="text-xs text-slate-500 mt-1"><i class="fas fa-location-dot mr-1"></i> 650-0015 神戶市中央區多聞通 3-3-1</p>
+                    <a href="https://www.google.com/maps/search/Hotel+Casabella+Inn+Kobe" target="_blank" class="mt-2 text-xs text-blue-500 flex items-center"><i class="fas fa-directions mr-1"></i> 開啟地圖導航</a>
+                </div>
+            </div>
+
+            <!-- Day 3 -->
+            <div id="tab-3" class="tab-content">
+                <h3 class="text-xl font-bold text-blue-600 mb-6 flex items-center">
+                    <i class="fas fa-camera-retro mr-2"></i> Day 3 | 7/20(一) 神戶優雅氛圍
+                </h3>
+                <div class="relative ml-2 mb-8">
+                    <div class="itinerary-step relative pl-12 pb-8">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold z-10">01</span>
+                        <h4 class="text-lg font-bold"><a href="https://www.google.com/maps/search/北野異人館街" target="_blank" class="map-link">北野異人館 <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a></h4>
+                        <p class="text-slate-600">感受充滿洋風氣息的古老別墅建築群。</p>
+                    </div>
+                    <div class="itinerary-step relative pl-12 pb-8">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold z-10">02</span>
+                        <h4 class="text-lg font-bold"><a href="https://www.google.com/maps/search/神戶三宮" target="_blank" class="map-link">三宮商圈 & 元町 <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a></h4>
+                        <p class="text-slate-600">神戶的核心購物區，百貨、南京町與精品店。</p>
+                    </div>
+                    <div class="itinerary-step relative pl-12">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold z-10">03</span>
+                        <h4 class="text-lg font-bold"><a href="https://www.google.com/maps/search/神戶港夜景" target="_blank" class="map-link">港區夜景 <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a></h4>
+                    </div>
+                </div>
+                <div class="hotel-card p-4 rounded-xl border border-slate-100">
+                    <h5 class="text-sm font-bold text-indigo-600 mb-2 italic"><i class="fas fa-bed mr-2"></i>今晚住宿 (神戶)</h5>
+                    <p class="font-bold text-slate-800">Hotel Casabella Inn Kobe</p>
+                    <p class="text-xs text-slate-500 mt-1"><i class="fas fa-location-dot mr-1"></i> 650-0015 神戶市中央區多聞通 3-3-1</p>
+                    <a href="https://www.google.com/maps/search/Hotel+Casabella+Inn+Kobe" target="_blank" class="mt-2 text-xs text-blue-500 flex items-center"><i class="fas fa-directions mr-1"></i> 開啟地圖導航</a>
+                </div>
+            </div>
+
+            <!-- Day 4 -->
+            <div id="tab-4" class="tab-content">
+                <h3 class="text-xl font-bold text-red-600 mb-6 flex items-center">
+                    <i class="fas fa-exchange-alt mr-2"></i> Day 4 | 7/21(二) 前往大阪
+                </h3>
+                <div class="relative ml-2 mb-8 border-l-2 border-dashed border-red-200">
+                    <div class="itinerary-step relative pl-12 pb-8">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center font-bold z-10">01</span>
+                        <h4 class="text-lg font-bold">前往大阪 / 放行李</h4>
+                    </div>
+                    <div class="itinerary-step relative pl-12 pb-8">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center font-bold z-10">02</span>
+                        <h4 class="text-lg font-bold"><a href="https://www.google.com/maps/search/大阪黑門市場" target="_blank" class="map-link">黑門市場吃午餐 <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a></h4>
+                        <p class="text-slate-600">品嚐和牛、生魚片與當季水果。</p>
+                    </div>
+                    <div class="itinerary-step relative pl-12">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center font-bold z-10">03</span>
+                        <h4 class="text-lg font-bold"><a href="https://www.google.com/maps/search/道頓堀" target="_blank" class="map-link">道頓堀 & 心齋橋 <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a></h4>
+                        <p class="text-slate-600">大阪最具代表性的商圈。</p>
+                    </div>
+                </div>
+                <div class="hotel-card p-4 rounded-xl border border-slate-100">
+                    <h5 class="text-sm font-bold text-red-600 mb-2 italic"><i class="fas fa-bed mr-2"></i>今晚住宿 (大阪)</h5>
+                    <p class="font-bold text-slate-800">むつみ庵・新今宮</p>
+                    <p class="text-xs text-slate-500 mt-1"><i class="fas fa-location-dot mr-1"></i> 542-0073 大阪市中央區日本橋 1-22-10</p>
+                    <a href="https://maps.app.goo.gl/8ear2AXoq8VFnBsQ6" target="_blank" class="mt-2 text-xs text-blue-500 flex items-center"><i class="fas fa-directions mr-1"></i> 開啟地圖導航</a>
+                </div>
+            </div>
+
+            <!-- Day 5 -->
+            <div id="tab-5" class="tab-content">
+                <h3 class="text-xl font-bold text-red-600 mb-6 flex items-center">
+                    <i class="fas fa-gamepad mr-2"></i> Day 5 | 7/22(三) 下町與動漫天堂
+                </h3>
+                <div class="relative ml-2 mb-8 border-l-2 border-dashed border-red-200">
+                    <div class="itinerary-step relative pl-12 pb-8">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center font-bold z-10">01</span>
+                        <h4 class="text-lg font-bold"><a href="https://www.google.com/maps/search/木津卸賣市場" target="_blank" class="map-link">木津市場 <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a></h4>
+                        <p class="text-slate-600">比黑門更在地的批發市場。</p>
+                    </div>
+                    <div class="itinerary-step relative pl-12 pb-8">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center font-bold z-10">02</span>
+                        <h4 class="text-lg font-bold"><a href="https://www.google.com/maps/search/日本橋電電城" target="_blank" class="map-link">難波 & 日本橋電電城 <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a></h4>
+                    </div>
+                    <div class="itinerary-step relative pl-12">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center font-bold z-10">03</span>
+                        <h4 class="text-lg font-bold"><a href="https://www.google.com/maps/search/通天閣" target="_blank" class="map-link">通天閣夜景 <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a></h4>
+                        <p class="text-slate-600">新世界氛圍，搭配串炸晚餐。</p>
+                    </div>
+                </div>
+                <div class="hotel-card p-4 rounded-xl border border-slate-100">
+                    <h5 class="text-sm font-bold text-red-600 mb-2 italic"><i class="fas fa-bed mr-2"></i>今晚住宿 (大阪)</h5>
+                    <p class="font-bold text-slate-800">むつみ庵・新今宮</p>
+                    <p class="text-xs text-slate-500 mt-1"><i class="fas fa-location-dot mr-1"></i> 542-0073 大阪市中央區日本橋 1-22-10</p>
+                    <a href="https://maps.app.goo.gl/8ear2AXoq8VFnBsQ6" target="_blank" class="mt-2 text-xs text-blue-500 flex items-center"><i class="fas fa-directions mr-1"></i> 開啟地圖導航</a>
+                </div>
+            </div>
+
+            <!-- Day 6 -->
+            <div id="tab-6" class="tab-content">
+                <h3 class="text-xl font-bold text-red-600 mb-6 flex items-center">
+                    <i class="fas fa-landmark mr-2"></i> Day 6 | 7/23(四) 大阪地標之旅
+                </h3>
+                <div class="relative ml-2 mb-8">
+                    <div class="itinerary-step relative pl-12 pb-8">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center font-bold z-10">01</span>
+                        <h4 class="text-lg font-bold"><a href="https://www.google.com/maps/search/大阪城天守閣" target="_blank" class="map-link">大阪城 <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a></h4>
+                    </div>
+                    <div class="itinerary-step relative pl-12 pb-8">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center font-bold z-10">02</span>
+                        <h4 class="text-lg font-bold"><a href="https://www.google.com/maps/search/大阪天滿宮" target="_blank" class="map-link">天滿宮 & 商店街 <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a></h4>
+                        <p class="text-slate-600">逛全日最長的天神橋筋商店街。</p>
+                    </div>
+                    <div class="itinerary-step relative pl-12">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center font-bold z-10">03</span>
+                        <h4 class="text-lg font-bold"><a href="https://www.google.com/maps/search/梅田商圈" target="_blank" class="map-link">梅田商圈 <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a></h4>
+                    </div>
+                </div>
+                <div class="hotel-card p-4 rounded-xl border border-slate-100">
+                    <h5 class="text-sm font-bold text-red-600 mb-2 italic"><i class="fas fa-bed mr-2"></i>今晚住宿 (大阪)</h5>
+                    <p class="font-bold text-slate-800">むつみ庵・新今宮</p>
+                    <p class="text-xs text-slate-500 mt-1"><i class="fas fa-location-dot mr-1"></i> 542-0073 大阪市中央區日本橋 1-22-10</p>
+                    <a href="https://maps.app.goo.gl/8ear2AXoq8VFnBsQ6" target="_blank" class="mt-2 text-xs text-blue-500 flex items-center"><i class="fas fa-directions mr-1"></i> 開啟地圖導航</a>
+                </div>
+            </div>
+
+            <!-- Day 7 -->
+            <div id="tab-7" class="tab-content">
+                <h3 class="text-xl font-bold text-emerald-600 mb-6 flex items-center">
+                    <i class="fas fa-train mr-2"></i> Day 7 | 7/24(五) 前進和歌山
+                </h3>
+                <div class="relative ml-2 mb-8 border-l-2 border-dashed border-emerald-200">
+                    <div class="itinerary-step relative pl-12 pb-8">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold z-10">01</span>
+                        <h4 class="text-lg font-bold">早上：補齊大阪行程</h4>
+                        <p class="text-slate-600">最後採買或補拍尚未拍到的景點。</p>
+                    </div>
+                    <div class="itinerary-step relative pl-12">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold z-10">02</span>
+                        <h4 class="text-lg font-bold">下午至傍晚：前往和歌山</h4>
+                        <p class="text-slate-600">移動至和歌山，辦理住宿。</p>
+                    </div>
+                </div>
+                <div class="hotel-card p-4 rounded-xl border border-slate-100">
+                    <h5 class="text-sm font-bold text-emerald-600 mb-2 italic"><i class="fas fa-bed mr-2"></i>今晚住宿 (和歌山)</h5>
+                    <p class="font-bold text-slate-800">かむろビル (Kamuro Building)</p>
+                    <p class="text-xs text-slate-500 mt-1"><i class="fas fa-location-dot mr-1"></i> 640-8114 和歌山縣和歌山市北ノ新地分銅丁 10</p>
+                    <a href="https://www.google.com/maps/search/かむろビル+和歌山" target="_blank" class="mt-2 text-xs text-blue-500 flex items-center"><i class="fas fa-directions mr-1"></i> 開啟地圖導航</a>
+                </div>
+            </div>
+
+            <!-- Day 8 -->
+            <div id="tab-8" class="tab-content">
+                <h3 class="text-xl font-bold text-emerald-600 mb-6 flex items-center">
+                    <i class="fas fa-fish mr-2"></i> Day 8 | 7/25(六) 和歌山深度遊
+                </h3>
+                <div class="relative ml-2 mb-8">
+                    <div class="itinerary-step relative pl-12 pb-8">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold z-10">01</span>
+                        <h4 class="text-lg font-bold"><a href="https://www.google.com/maps/search/和歌山城" target="_blank" class="map-link">和歌山城 <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a></h4>
+                    </div>
+                    <div class="itinerary-step relative pl-12 pb-8">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold z-10">02</span>
+                        <h4 class="text-lg font-bold"><a href="https://www.google.com/maps/search/和歌山黑潮市場" target="_blank" class="map-link">黑潮市場 <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a></h4>
+                        <p class="text-slate-600">必看鮪魚秀與海產採購。</p>
+                    </div>
+                    <div class="itinerary-step relative pl-12 pb-8">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold z-10">03</span>
+                        <h4 class="text-lg font-bold"><a href="https://www.google.com/maps/search/和歌山+CENTRAL+CITY" target="_blank" class="map-link">CENTRAL CITY 逛街 <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a></h4>
+                    </div>
+                    <div class="itinerary-step relative pl-12">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold z-10">04</span>
+                        <h4 class="text-lg font-bold"><a href="https://www.google.com/maps/search/JR和歌山駅" target="_blank" class="map-link">和歌山車站附近逛街 <i class="fas fa-map-marker-alt ml-1 text-xs"></i></a></h4>
+                    </div>
+                </div>
+                <div class="hotel-card p-4 rounded-xl border border-slate-100">
+                    <h5 class="text-sm font-bold text-emerald-600 mb-2 italic"><i class="fas fa-bed mr-2"></i>今晚住宿 (和歌山)</h5>
+                    <p class="font-bold text-slate-800">かむろビル (Kamuro Building)</p>
+                    <p class="text-xs text-slate-500 mt-1"><i class="fas fa-location-dot mr-1"></i> 640-8114 和歌山縣和歌山市北ノ新地分銅丁 10</p>
+                    <a href="https://www.google.com/maps/search/かむろビル+和歌山" target="_blank" class="mt-2 text-xs text-blue-500 flex items-center"><i class="fas fa-directions mr-1"></i> 開啟地圖導航</a>
+                </div>
+            </div>
+
+            <!-- Day 9 -->
+            <div id="tab-9" class="tab-content">
+                <h3 class="text-xl font-bold text-slate-700 mb-6 flex items-center">
+                    <i class="fas fa-plane-departure mr-2"></i> Day 9 | 7/26(日) 平安返家
+                </h3>
+                <div class="relative ml-2">
+                    <div class="itinerary-step relative pl-12 pb-8 text-slate-400">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-slate-300 text-white rounded-full flex items-center justify-center font-bold z-10">01</span>
+                        <p class="text-sm font-medium">早上</p>
+                        <h4 class="text-lg font-bold">前往 KIX 機場</h4>
+                        <p>從和歌山搭乘機場巴士或 JR 快速前往關西機場。</p>
+                    </div>
+                    <div class="itinerary-step relative pl-12 text-slate-400">
+                        <span class="absolute left-0 top-0 w-10 h-10 bg-slate-300 text-white rounded-full flex items-center justify-center font-bold z-10">02</span>
+                        <p class="text-sm font-medium">13:30</p>
+                        <h4 class="text-lg font-bold">飛機起飛</h4>
+                        <p>結束 9 天完美旅程。</p>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- 飛機資訊主分頁 -->
+            <div id="main-tab-flight" class="main-tab-content">
+                <h3 class="text-xl font-bold text-indigo-600 mb-6 flex items-center">
+                    <i class="fas fa-plane mr-2"></i> 飛機資訊
+                </h3>
+                <div class="space-y-6">
+                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                        <h4 class="font-bold text-blue-800 mb-3 flex items-center">
+                            <i class="fas fa-plane-departure mr-2"></i> 去程航班 (7/18)
+                        </h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-start">
+                                <span class="font-medium text-slate-700 w-24">航空公司：</span>
+                                <span class="text-slate-600 flex-1">泰越捷航空</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="font-medium text-slate-700 w-24">航班號碼：</span>
+                                <span class="text-slate-600 flex-1">VZ566</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="font-medium text-slate-700 w-24">訂票代碼：</span>
+                                <span class="text-slate-600 flex-1">4D4493 / 3BDCDS</span>
+                            </div>
+                            <div class="mt-3 pt-3 border-t border-blue-200">
+                                <div class="flex items-center justify-center gap-3 text-lg font-bold">
+                                    <div class="text-center">
+                                        <div class="text-blue-700 text-xl">07:45</div>
+                                        <div class="text-slate-600 text-base mt-1">TPE 桃園國際機場</div>
+                                    </div>
+                                    <i class="fas fa-arrow-right text-blue-500 text-2xl"></i>
+                                    <div class="text-center">
+                                        <div class="text-blue-700 text-xl">11:25</div>
+                                        <div class="text-slate-600 text-base mt-1">KIX 關西國際機場</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3 pt-3 border-t border-blue-200">
+                                <p class="font-medium text-slate-700 mb-3">行李資訊：</p>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm border-collapse">
+                                        <thead>
+                                            <tr class="bg-blue-100">
+                                                <th class="border border-blue-200 px-3 py-2 text-left font-semibold text-blue-800">行李類型</th>
+                                                <th class="border border-blue-200 px-3 py-2 text-left font-semibold text-blue-800">重量限制</th>
+                                                <th class="border border-blue-200 px-3 py-2 text-left font-semibold text-blue-800">件數限制</th>
+                                                <th class="border border-blue-200 px-3 py-2 text-left font-semibold text-blue-800">大小限制</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="border border-blue-200 px-3 py-2 font-medium text-slate-700">手提行李</td>
+                                                <td class="border border-blue-200 px-3 py-2 text-slate-600">7KG</td>
+                                                <td class="border border-blue-200 px-3 py-2 text-slate-600">2件</td>
+                                                <td class="border border-blue-200 px-3 py-2 text-slate-600">56cm × 36cm × 23cm</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="border border-blue-200 px-3 py-2 font-medium text-slate-700">托運行李</td>
+                                                <td class="border border-blue-200 px-3 py-2 text-slate-600">15KG</td>
+                                                <td class="border border-blue-200 px-3 py-2 text-slate-600">1件</td>
+                                                <td class="border border-blue-200 px-3 py-2 text-slate-600">119cm × 119cm × 81cm</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="mt-3 flex items-start">
+                                    <span class="font-medium text-slate-700 w-24">官網連結：</span>
+                                    <span class="text-slate-600 flex-1">
+                                        <a href="https://www.vietjetair.com/zh-tw/flight-tickets/flights-from-taiwan-to-vietnam/" target="_blank" class="text-blue-600 hover:text-blue-800 underline">泰越捷航空官網 <i class="fas fa-external-link-alt mr-1 text-xs"></i></a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-amber-50 p-4 rounded-xl border border-amber-100">
+                        <h4 class="font-bold text-amber-800 mb-3 flex items-center">
+                            <i class="fas fa-plane-arrival mr-2"></i> 回程航班 (7/26)
+                        </h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-start">
+                                <span class="font-medium text-slate-700 w-24">航空公司：</span>
+                                <span class="text-slate-600 flex-1">泰國獅子航空</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="font-medium text-slate-700 w-24">航班號碼：</span>
+                                <span class="text-slate-600 flex-1">SL397</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="font-medium text-slate-700 w-24">訂票代碼：</span>
+                                <span class="text-slate-600 flex-1">IRLHAP</span>
+                            </div>
+                            <div class="mt-3 pt-3 border-t border-amber-200">
+                                <div class="flex items-center justify-center gap-3 text-lg font-bold">
+                                    <div class="text-center">
+                                        <div class="text-amber-700 text-xl">13:30</div>
+                                        <div class="text-slate-600 text-base mt-1">KIX 關西國際機場</div>
+                                    </div>
+                                    <i class="fas fa-arrow-right text-amber-500 text-2xl"></i>
+                                    <div class="text-center">
+                                        <div class="text-amber-700 text-xl">15:20</div>
+                                        <div class="text-slate-600 text-base mt-1">TPE 桃園國際機場</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3 pt-3 border-t border-amber-200">
+                                <p class="font-medium text-slate-700 mb-3">行李資訊：</p>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm border-collapse">
+                                        <thead>
+                                            <tr class="bg-amber-100">
+                                                <th class="border border-amber-200 px-3 py-2 text-left font-semibold text-amber-800">行李類型</th>
+                                                <th class="border border-amber-200 px-3 py-2 text-left font-semibold text-amber-800">重量限制</th>
+                                                <th class="border border-amber-200 px-3 py-2 text-left font-semibold text-amber-800">件數限制</th>
+                                                <th class="border border-amber-200 px-3 py-2 text-left font-semibold text-amber-800">大小限制</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="border border-amber-200 px-3 py-2 font-medium text-slate-700">手提行李</td>
+                                                <td class="border border-amber-200 px-3 py-2 text-slate-600">7KG</td>
+                                                <td class="border border-amber-200 px-3 py-2 text-slate-600">2件</td>
+                                                <td class="border border-amber-200 px-3 py-2 text-slate-600">30cm × 40cm × 20cm</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="border border-amber-200 px-3 py-2 font-medium text-slate-700">托運行李</td>
+                                                <td class="border border-amber-200 px-3 py-2 text-slate-600">總和80KG<br><span class="text-xs text-slate-500">(單件不超過32公斤)</span></td>
+                                                <td class="border border-amber-200 px-3 py-2 text-slate-600">不計件數</td>
+                                                <td class="border border-amber-200 px-3 py-2 text-slate-600">單邊不得超過100公分</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="mt-3 flex items-start">
+                                    <span class="font-medium text-slate-700 w-24">官網連結：</span>
+                                    <span class="text-slate-600 flex-1">
+                                        <a href="https://www.lionairthai.com/tw/tw/" target="_blank" class="text-amber-600 hover:text-amber-800 underline">泰國獅子航空官網 <i class="fas fa-external-link-alt mr-1 text-xs"></i></a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 信用卡／刷卡攻略主分頁 -->
+            <div id="main-tab-cards" class="main-tab-content">
+                <h3 class="text-xl font-bold text-violet-600 mb-2 flex items-center">
+                    <i class="fas fa-credit-card mr-2"></i> 刷卡攻略
+                </h3>
+                <p class="text-sm text-slate-500 mb-6">玉山熊本熊卡、台新 Richart 並列；熊本熊<strong>加碼 6%</strong>條件與試算如下（匯率請自行輸入）。實際回饋以帳單及銀行公告為準。</p>
+                <div class="space-y-6">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <h4 class="font-bold text-violet-700 mb-3 flex items-center text-base">
+                            <i class="fas fa-paw mr-2 text-rose-500"></i> 玉山熊本熊卡｜日本加碼 6% 一覽
+                        </h4>
+                        <!-- <p class="text-xs text-slate-500 mb-3">資料來源：玉山活動頁（日本指定特店最高 8.5%）。結構為<strong>日本一般 2.5%</strong>（無上限）＋<strong>指定店加碼 6%</strong>（每期每歸戶加碼部分上限 NT$500）。</p>
+                        <ul class="text-sm text-slate-700 space-y-2 list-disc pl-5 mb-4">
+                            <li><strong>活動期間：</strong>2026/1/1～2026/6/30</li>
+                            <li><strong>加碼 6%：</strong>僅限「指定日本商店」消費；<strong>每期每歸戶加碼回饋上限 NT$500</strong>（2.5% 部分另計、無上限）</li>
+                            <li><strong>登錄：</strong>須完成活動登錄；活動期間內原則上登錄 1 次即可（若曾於 2025/12/31 前登錄舊檔，2026 須重新登錄）</li>
+                            <li><strong>國外交易服務費：</strong>1.5%（官網公告）</li>
+                            <li><strong>帳單判讀：</strong>若商店位於百貨、車站美食街等致帳單名稱無法辨識為該店，可能不列入回饋（依活動條款）</li>
+                        </ul> -->
+                        <p class="text-xs font-bold text-violet-800 mb-2">加碼 6% 適用之指定類型（節錄，完整以官網為準）</p>
+                        <div class="grid sm:grid-cols-2 gap-2 text-xs text-slate-600">
+                            <div class="bg-violet-50 rounded-lg p-3 border border-violet-100">
+                                <p class="font-semibold text-violet-800 mb-1">交通／租車</p>
+                                <p>Suica、PASMO、ICOCA 儲值；JR 鐵路公司購票；日航訂票；Toyota / Times / NIPPON / OTS / ORIX 等租車</p>
+                            </div>
+                            <div class="bg-violet-50 rounded-lg p-3 border border-violet-100">
+                                <p class="font-semibold text-violet-800 mb-1">樂園／景點</p>
+                                <p>東京迪士尼、哈利波特影城、USJ、豪斯登堡、名古屋樂高、吉伊卡哇樂園等（依官網名單）</p>
+                            </div>
+                            <div class="bg-violet-50 rounded-lg p-3 border border-violet-100">
+                                <p class="font-semibold text-violet-800 mb-1">餐飲</p>
+                                <p>勝烈亭、敘敘苑、牛角、力丸燒肉、六歌仙燒肉</p>
+                                <p>鳥貴族、壽司郎、藏壽司、松屋、Sukiya、Shake Shack、DOUTOR、Fuglen</p>
+                            </div>
+                            <div class="bg-violet-50 rounded-lg p-3 border border-violet-100">
+                                <p class="font-semibold text-violet-800 mb-1">購物／藥妝／生活</p>
+                                <p>日本MITSUI購物園區 ( lalaport、大阪門真 等)</p>
+                                <p>BicCamera、Yodobashi、松本清、唐吉訶德、大國藥妝、無印、UNIQLO、GU</p>
+                            </div>
+                        </div>
+                        <p class="mt-3 text-xs"><a href="https://event.esunbank.com.tw/credit/kumamon-card/japan-discount.html" target="_blank" rel="noopener" class="text-violet-600 underline">開啟玉山熊本熊卡｜日本優惠官方頁 <i class="fas fa-external-link-alt text-[10px]"></i></a></p>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-violet-50 to-indigo-50 p-4 rounded-xl border border-violet-200">
+                        <h4 class="font-bold text-violet-900 mb-2 flex items-center">
+                            <i class="fas fa-calculator mr-2"></i> 熊本熊回饋試算（可自填匯率）
+                        </h4>
+                        <p class="text-xs text-slate-600 mb-4">假設刷卡金額以日圓計價，帳單折台幣＝日圓 × 匯率。試算「指定店」時：回饋＝台幣×2.5% ＋ min(台幣×6%, 500)。再扣除 1.5% 海外手續費得淨額（粗估）。</p>
+                        <div class="flex flex-wrap gap-4 mb-4 text-sm">
+                            <label class="flex flex-col gap-1">
+                                <span class="font-medium text-slate-700">消費日圓 (JPY)</span>
+                                <input type="number" id="kumamon-jpy" min="0" step="1" inputmode="numeric" value="10000" class="w-40 px-3 py-2 rounded-lg border border-slate-300 bg-white" oninput="calcKumamonCashback()">
+                            </label>
+                            <label class="flex flex-col gap-1">
+                                <span class="font-medium text-slate-700">匯率：1 日圓 = 幾元台幣</span>
+                                <input type="number" id="kumamon-rate" min="0" step="0.0001" inputmode="decimal" value="0.201" class="w-40 px-3 py-2 rounded-lg border border-slate-300 bg-white" oninput="calcKumamonCashback()" title="例：0.21 表示 1 日圓兌 0.21 新台幣">
+                            </label>
+                        </div>
+                        <fieldset class="mb-4 text-sm">
+                            <legend class="font-medium text-slate-700 mb-2">消費類型</legend>
+                            <label class="inline-flex items-center gap-2 mr-4 cursor-pointer">
+                                <input type="radio" name="kumamon-mode" value="designated" checked onchange="calcKumamonCashback()">
+                                <span>指定日本商店（2.5% + 加碼 6%，加碼每期上限 500）</span>
+                            </label>
+                            <label class="inline-flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="kumamon-mode" value="general" onchange="calcKumamonCashback()">
+                                <span>僅日本一般消費（2.5%，無加碼 6%）</span>
+                            </label>
+                        </fieldset>
+                        <div class="bg-white rounded-xl p-4 border border-violet-100 text-sm space-y-2">
+                            <div class="flex justify-between border-b border-slate-100 pb-2"><span class="text-slate-600">折台幣約</span><span class="font-bold text-slate-800" id="kumamon-out-twd">—</span></div>
+                            <div class="flex justify-between"><span class="text-slate-600">2.5% 回饋</span><span class="font-mono text-violet-800" id="kumamon-out-r25">—</span></div>
+                            <div class="flex justify-between"><span class="text-slate-600">加碼 6%（已計上限）</span><span class="font-mono text-violet-800" id="kumamon-out-r6">—</span></div>
+                            <div class="flex justify-between pt-2 border-t border-slate-100 font-bold"><span class="text-slate-700">現金回饋合計</span><span class="text-indigo-700" id="kumamon-out-total">—</span></div>
+                            <div class="flex justify-between text-amber-800"><span>海外手續費 1.5%</span><span class="font-mono" id="kumamon-out-fee">—</span></div>
+                            <div class="flex justify-between text-emerald-800 font-bold"><span>淨額（回饋 − 手續費）</span><span id="kumamon-out-net">—</span></div>
+                            <p class="text-xs text-slate-500 pt-2" id="kumamon-out-capnote"></p>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-emerald-50 to-teal-50 p-4 rounded-xl border border-emerald-200">
+                        <h4 class="font-bold text-emerald-900 mb-2 flex items-center">
+                            <i class="fas fa-credit-card mr-2"></i> 兩銀行刷卡比較試算
+                        </h4>
+                        <div class="mb-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <label class="flex flex-col gap-1 text-sm">
+                                    <span class="font-medium text-slate-700">刷卡消費金額 (JPY)</span>
+                                    <input type="number" id="bank-jpy" min="0" step="1" inputmode="numeric" value="100" class="w-full sm:w-44 px-3 py-2 rounded-lg border border-slate-300 bg-white" oninput="syncSharedJpy('bank-jpy')">
+                                </label>
+                                <label class="flex flex-col gap-1 text-sm min-w-0">
+                                    <span class="font-medium text-slate-700">日幣現鈔匯率 (1 日圓 = 幾元台幣)</span>
+                                    <input type="number" id="bank-cash-rate" min="0" step="0.0001" inputmode="decimal" value="0.2000" class="w-full min-w-0 px-3 py-2 rounded-lg border border-slate-300 bg-white" oninput="calcBankCompare()">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div class="min-w-0 bg-white p-4 rounded-xl border border-emerald-100 space-y-3">
+                                <p class="font-semibold text-emerald-800">玉山</p>
+                                <label class="flex flex-col gap-1 text-sm">
+                                    <span class="text-slate-600">匯率 (1 日圓 = 幾元台幣)</span>
+                                    <input type="number" id="bank-a-rate" min="0" step="0.0001" inputmode="decimal" value="0.2000" class="w-full min-w-0 px-3 py-2 rounded-lg border border-slate-300" oninput="calcBankCompare()">
+                                </label>
+                                <p class="text-sm text-slate-700"><span class="font-medium">回饋：</span>2.5%</p>
+                                <p class="text-sm text-slate-700"><span class="font-medium">海外手續費：</span>1.5%</p>
+                            </div>
+
+                            <div class="min-w-0 bg-white p-4 rounded-xl border border-teal-100 space-y-3">
+                                <p class="font-semibold text-teal-800">台新</p>
+                                <label class="flex flex-col gap-1 text-sm">
+                                    <span class="text-slate-600">匯率 (1 日圓 = 幾元台幣)</span>
+                                    <input type="number" id="bank-b-rate" min="0" step="0.0001" inputmode="decimal" value="0.1982" class="w-full min-w-0 px-3 py-2 rounded-lg border border-slate-300" oninput="calcBankCompare()">
+                                </label>
+                                <p class="text-sm text-slate-700"><span class="font-medium">回饋：</span>3.3%（無條件捨去到整數）</p>
+                                <p class="text-sm text-slate-700"><span class="font-medium">海外手續費：</span>1.5%</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl p-4 border border-emerald-100 text-sm space-y-3 max-w-full overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full border-collapse table-fixed">
+                                    <thead>
+                                        <tr class="bg-emerald-100 text-emerald-900">
+                                            <th class="border border-emerald-200 px-3 py-2 text-left">項目</th>
+                                            <th class="border border-emerald-200 px-3 py-2 text-left" id="bank-head-a">玉山</th>
+                                            <th class="border border-emerald-200 px-3 py-2 text-left" id="bank-head-b">台新</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="border border-emerald-200 px-3 py-2 text-slate-700">台幣</td>
+                                            <td class="border border-emerald-200 px-3 py-2 font-mono" id="bank-a-twd">—</td>
+                                            <td class="border border-emerald-200 px-3 py-2 font-mono" id="bank-b-twd">—</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-emerald-200 px-3 py-2 text-slate-700">回饋</td>
+                                            <td class="border border-emerald-200 px-3 py-2 font-mono" id="bank-a-cb">—</td>
+                                            <td class="border border-emerald-200 px-3 py-2 font-mono" id="bank-b-cb">—</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-emerald-200 px-3 py-2 text-slate-700">手續費</td>
+                                            <td class="border border-emerald-200 px-3 py-2 font-mono" id="bank-a-fee">—</td>
+                                            <td class="border border-emerald-200 px-3 py-2 font-mono" id="bank-b-fee">—</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-emerald-200 px-3 py-2 text-slate-700">成本（折台幣+手續費-回饋）</td>
+                                            <td class="border border-emerald-200 px-3 py-2 font-bold" id="bank-a-cost">—</td>
+                                            <td class="border border-emerald-200 px-3 py-2 font-bold" id="bank-b-cost">—</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-emerald-200 px-3 py-2 text-slate-700">日幣現鈔成本（僅匯率換算）</td>
+                                            <td class="border border-emerald-200 px-3 py-2 font-mono" id="bank-cash-cost" colspan="2">—</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="text-sm font-bold text-emerald-700 break-words" id="bank-recommend">—</p>
+                            <p class="text-xs text-slate-500 break-words" id="bank-note">—</p>
+                        </div>
+                    </div>
+
+                    <div id="paypay-compare-block" class="bg-gradient-to-br from-sky-50 to-cyan-50 p-4 rounded-xl border border-sky-200">
+                        <h4 class="font-bold text-sky-900 mb-2 flex items-center">
+                            <i class="fas fa-scale-balanced mr-2"></i> PayPay 兩銀行刷卡比較試算
+                        </h4>
+                        <p class="text-xs mb-3">
+                            <a href="https://www.mastercard.com.cn/zh-cn/personal/get-support/convert-currency.html" target="_blank" rel="noopener" class="text-sky-700 underline">
+                                開啟 Mastercard 匯率換算頁面 <i class="fas fa-external-link-alt text-[10px]"></i>
+                            </a>
+                        </p>
+                        <!-- <p class="text-xs text-slate-600 mb-4">固定比較規則：A=玉山（3.5%，上限 NT$100）、B=台新（3.8%，無上限）。兩家都以台幣金額計算回饋；台新回饋會無條件捨去到整數，玉山不捨去。</p> -->
+
+                        <div class="mb-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <label class="flex flex-col gap-1 text-sm">
+                                    <span class="font-medium text-slate-700">PayPay 消費金額 (JPY)</span>
+                                    <input type="number" id="pp-jpy" min="0" step="1" inputmode="numeric" value="100" class="w-full sm:w-44 px-3 py-2 rounded-lg border border-slate-300 bg-white" oninput="syncSharedJpy('pp-jpy')">
+                                </label>
+                                <label class="flex flex-col gap-1 text-sm min-w-0">
+                                    <span class="font-medium text-slate-700">日幣現鈔匯率 (1 日圓 = 幾元台幣)</span>
+                                    <input type="number" id="pp-cash-rate" min="0" step="0.0001" inputmode="decimal" value="0.2000" class="w-full min-w-0 px-3 py-2 rounded-lg border border-slate-300 bg-white" oninput="calcPayPayCompare()">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div class="min-w-0 bg-white p-4 rounded-xl border border-sky-100 space-y-3">
+                                <p class="font-semibold text-sky-800">玉山</p>
+                                <label class="flex flex-col gap-1 text-sm">
+                                    <span class="text-slate-600">匯率 (1 日圓 = 幾元台幣)</span>
+                                    <input type="number" id="pp-a-rate" min="0" step="0.0001" inputmode="decimal" value="0.1999" class="w-full min-w-0 px-3 py-2 rounded-lg border border-slate-300" oninput="calcPayPayCompare()">
+                                </label>
+                                <p class="text-sm text-slate-700"><span class="font-medium">回饋：</span>3.5%</p>
+                                <p class="text-sm text-slate-700"><span class="font-medium">回饋上限：</span>NT$ 100</p>
+                                <p class="text-sm text-slate-700"><span class="font-medium">海外手續費：</span>0%</p>
+                            </div>
+
+                            <div class="min-w-0 bg-white p-4 rounded-xl border border-cyan-100 space-y-3">
+                                <p class="font-semibold text-cyan-800">台新</p>
+                                <label class="flex flex-col gap-1 text-sm">
+                                    <span class="text-slate-600">匯率 (1 日圓 = 幾元台幣)</span>
+                                    <input type="number" id="pp-b-rate" min="0" step="0.0001" inputmode="decimal" value="0.1999" class="w-full min-w-0 px-3 py-2 rounded-lg border border-slate-300" oninput="calcPayPayCompare()">
+                                </label>
+                                <p class="text-sm text-slate-700"><span class="font-medium">回饋：</span>3.8%</p>
+                                <p class="text-sm text-slate-700"><span class="font-medium">回饋上限：</span>無上限</p>
+                                <p class="text-sm text-slate-700"><span class="font-medium">海外手續費：</span>0%</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl p-4 border border-sky-100 text-sm space-y-3 max-w-full overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full border-collapse table-fixed">
+                                    <thead>
+                                        <tr class="bg-sky-100 text-sky-900">
+                                            <th class="border border-sky-200 px-3 py-2 text-left">項目</th>
+                                            <th class="border border-sky-200 px-3 py-2 text-left" id="pp-head-a">銀行 A</th>
+                                            <th class="border border-sky-200 px-3 py-2 text-left" id="pp-head-b">銀行 B</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="border border-sky-200 px-3 py-2 text-slate-700">台幣</td>
+                                            <td class="border border-sky-200 px-3 py-2 font-mono" id="pp-a-twd">—</td>
+                                            <td class="border border-sky-200 px-3 py-2 font-mono" id="pp-b-twd">—</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-sky-200 px-3 py-2 text-slate-700">回饋</td>
+                                            <td class="border border-sky-200 px-3 py-2 font-mono" id="pp-a-cb">—</td>
+                                            <td class="border border-sky-200 px-3 py-2 font-mono" id="pp-b-cb">—</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-sky-200 px-3 py-2 text-slate-700">成本（折台幣-回饋）</td>
+                                            <td class="border border-sky-200 px-3 py-2 font-bold" id="pp-a-cost">—</td>
+                                            <td class="border border-sky-200 px-3 py-2 font-bold" id="pp-b-cost">—</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border border-sky-200 px-3 py-2 text-slate-700">日幣現鈔成本（僅匯率換算）</td>
+                                            <td class="border border-sky-200 px-3 py-2 font-mono" id="pp-cash-cost" colspan="2">—</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="text-sm font-bold text-emerald-700 break-words" id="pp-recommend">—</p>
+                            <p class="text-xs text-slate-500 break-words" id="pp-note">—</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-violet-50 p-4 rounded-xl border border-violet-100">
+                        <h4 class="font-bold text-violet-800 mb-3 flex items-center">
+                            <i class="fas fa-table mr-2"></i> 什麼時候刷哪張？（速查）
+                        </h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm border-collapse min-w-[280px]">
+                                <thead>
+                                    <tr class="bg-violet-100">
+                                        <th class="border border-violet-200 px-3 py-2 text-left font-semibold text-violet-800">消費情境</th>
+                                        <th class="border border-violet-200 px-3 py-2 text-left font-semibold text-violet-800">建議卡片</th>
+                                        <th class="border border-violet-200 px-3 py-2 text-left font-semibold text-violet-800">回饋／備註</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="border border-violet-200 px-3 py-2 text-slate-700">日本「指定店」名單內</td>
+                                        <td class="border border-violet-200 px-3 py-2">熊本熊</td>
+                                        <td class="border border-violet-200 px-3 py-2 text-xs">最高約 8.5%（2.5%+6%）；加碼每期上限 500 元</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-violet-200 px-3 py-2 text-slate-700">日本一般（非指定店）</td>
+                                        <td class="border border-violet-200 px-3 py-2">熊本熊</td>
+                                        <td class="border border-violet-200 px-3 py-2 text-xs">2.5% 無上限；另計 1.5% 海外費</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-violet-200 px-3 py-2 text-slate-700">海外／玩旅刷條件達成</td>
+                                        <td class="border border-violet-200 px-3 py-2">Richart</td>
+                                        <td class="border border-violet-200 px-3 py-2 text-xs">依台新「玩旅刷」與當期公告（如基礎 3.3%、加碼後最高等）；請對照官網</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-violet-200 px-3 py-2 text-slate-700">台灣一般／LINE Pay 等</td>
+                                        <td class="border border-violet-200 px-3 py-2">Richart</td>
+                                        <td class="border border-violet-200 px-3 py-2 text-xs">依 Richart 2026 權益（國內／電支條件各自不同）</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <h4 class="font-bold text-violet-700 mb-2 flex items-center text-sm">
+                                <i class="fas fa-id-card mr-2"></i> 玉山熊本熊卡
+                            </h4>
+                            <ul class="text-sm text-slate-600 space-y-2">
+                                <li><span class="font-medium text-slate-700">日本指定店：</span>2.5% + 加碼 6%（加碼每期上限 NT$500）</li>
+                                <li><span class="font-medium text-slate-700">日本一般：</span>2.5% 無上限</li>
+                                <li><span class="font-medium text-slate-700">注意：</span>須登錄、1.5% 海外手續費、帳單商戶名須能辨識</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <h4 class="font-bold text-violet-700 mb-2 flex items-center text-sm">
+                                <i class="fas fa-id-card mr-2"></i> 台新 Richart 卡
+                            </h4>
+                            <ul class="text-sm text-slate-600 space-y-2">
+                                <li><span class="font-medium text-slate-700">海外：</span>多與「玩旅刷」方案／帳戶條件掛鉤，依當期公告（請以 <a href="https://richart.tw/TSDIB_RichartWeb/card/credit-card" target="_blank" rel="noopener" class="text-violet-600 underline">台新 Richart 官網</a> 為準）</li>
+                                <li><span class="font-medium text-slate-700">其他：</span>外幣 ATM、換匯優惠等依活動</li>
+                                <li><span class="font-medium text-slate-700">注意：</span>回饋與上限請逐期對帳單確認</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-600 leading-relaxed">
+                        <p class="font-bold text-slate-700 mb-1"><i class="fas fa-lightbulb text-amber-500 mr-1"></i> 小提示</p>
+                        <p>結帳前先看「通路類別」與「是否算海外」，日幣計價時留意店員是否誤刷 DCC（動態轉換）；優惠常隨活動調整，出發前可再上發卡行官網確認。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VJW 資料主分頁 -->
+            <div id="main-tab-vjw" class="main-tab-content">
+                <h3 class="text-xl font-bold text-emerald-600 mb-6 flex items-center">
+                    <i class="fas fa-qrcode mr-2"></i> VJW 資料
+                </h3>
+                <div class="space-y-6">
+                    <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+                        <h4 class="font-bold text-emerald-800 mb-3 flex items-center">
+                            <i class="fas fa-user mr-2"></i> 個人資料
+                        </h4>
+                        <div class="space-y-4 text-sm">
+                            <div>
+                                <p class="font-bold text-emerald-700 mb-2">航班</p>
+                                <div class="space-y-2 pl-4">
+                                    <div class="flex items-start">
+                                        <span class="font-medium text-slate-700 w-32">航空公司名稱：</span>
+                                        <span class="text-slate-600 flex-1">泰越捷 VZ : VIETJET AIR (VJC)</span>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <span class="font-medium text-slate-700 w-32">班機號：</span>
+                                        <span class="text-slate-600 flex-1">VZ566</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pt-3 border-t border-emerald-200">
+                                <p class="font-bold text-emerald-700 mb-2">住宿 (日文英文擇一填就好)</p>
+                                <div class="space-y-2 pl-4">
+                                    <div class="flex items-start">
+                                        <span class="font-medium text-slate-700 w-32">都道府縣：</span>
+                                        <span class="text-slate-600 flex-1">兵庫県 / HYOGO KEN</span>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <span class="font-medium text-slate-700 w-32">市區町村名：</span>
+                                        <span class="text-slate-600 flex-1">神戸市中央区 / KOBE SHI CHUO KU</span>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <span class="font-medium text-slate-700 w-32">町字、番地：</span>
+                                        <span class="text-slate-600 flex-1">多聞通 3-3-1 / TAMON DORI 3-3-1</span>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <span class="font-medium text-slate-700 w-32">飯店名稱：</span>
+                                        <span class="text-slate-600 flex-1">ホテル カサベラ イン 神戸 / Hotel Casabella Inn Kobe</span>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <span class="font-medium text-slate-700 w-32">在日本電話號碼：</span>
+                                        <span class="text-slate-600 flex-1">81 78 578 0001</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                        <h4 class="font-bold text-blue-800 mb-3 flex items-center">
+                            <i class="fas fa-qrcode mr-2"></i> QR Code 資訊
+                        </h4>
+                        <div class="space-y-3 text-sm">
+                            <div>
+                                <p class="font-medium text-slate-700 mb-2">入境審查 QR Code：</p>
+                                <p class="text-slate-500 text-xs mb-2">請在 Visit Japan Web 完成入境審查手續後，截圖保存 QR Code</p>
+                                <div class="bg-white p-4 rounded-lg border border-slate-200 min-h-[100px] flex items-center justify-center text-slate-400">
+                                    <i class="fas fa-image text-3xl"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <p class="font-medium text-slate-700 mb-2">海關申報 QR Code：</p>
+                                <p class="text-slate-500 text-xs mb-2">請在 Visit Japan Web 完成海關申報手續後，截圖保存 QR Code</p>
+                                <div class="bg-white p-4 rounded-lg border border-slate-200 min-h-[100px] flex items-center justify-center text-slate-400">
+                                    <i class="fas fa-image text-3xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-amber-50 p-4 rounded-xl border border-amber-100">
+                        <h4 class="font-bold text-amber-800 mb-3 flex items-center">
+                            <i class="fas fa-info-circle mr-2"></i> 重要提醒
+                        </h4>
+                        <ul class="space-y-2 text-sm text-amber-800">
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle mr-2 mt-0.5 text-amber-600"></i>
+                                <span>請在出發前完成 Visit Japan Web 的註冊與登錄</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle mr-2 mt-0.5 text-amber-600"></i>
+                                <span>建議將 QR Code 截圖保存至手機相簿，方便快速出示</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle mr-2 mt-0.5 text-amber-600"></i>
+                                <span>入境審查與海關申報的 QR Code 需分別準備</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle mr-2 mt-0.5 text-amber-600"></i>
+                                <span>Visit Japan Web 網址：<a href="https://www.vjw.digital.go.jp" target="_blank" class="text-blue-600 underline">www.vjw.digital.go.jp</a></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 工具欄 -->
+        <section class="grid md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-100">
+                <h2 class="text-lg font-bold mb-4 flex items-center text-emerald-600">
+                    <i class="fas fa-check-square mr-2"></i> 快速核對清單
+                </h2>
+                <ul class="space-y-2 text-sm">
+                    <li class="flex items-center space-x-2" onclick="toggleCheck(this)">
+                        <input type="checkbox" class="w-4 h-4 rounded border-slate-300">
+                        <span>護照、機票、VJW QR Code</span>
+                    </li>
+                    <li class="flex items-center space-x-2" onclick="toggleCheck(this)">
+                        <input type="checkbox" class="w-4 h-4 rounded border-slate-300">
+                        <span>日圓現鈔、悠遊卡/suica</span>
+                    </li>
+                    <li class="flex items-center space-x-2" onclick="toggleCheck(this)">
+                        <input type="checkbox" class="w-4 h-4 rounded border-slate-300">
+                        <span>網卡、衣物、藥品</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="bg-amber-50 rounded-2xl p-6 border border-amber-100">
+                <h2 class="text-lg font-bold mb-2 flex items-center text-amber-700">
+                    <i class="fas fa-info-circle mr-2"></i> 小提醒
+                </h2>
+                <p class="text-xs text-amber-800 leading-relaxed">
+                    <b>高速船提醒：</b>12:00 抵達後，請先至機場 KIX 第一航廈 1F 的船票櫃檯購買票卷，再搭乘接駁巴士前往碼頭。
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="mt-8 py-8 bg-slate-800 text-center text-slate-400 text-xs">
+        <p>祝旅途平安順心！ ❤️</p>
+    </footer>
+
+    <script>
+        function calcKumamonCashback() {
+            const jpyEl = document.getElementById('kumamon-jpy');
+            const rateEl = document.getElementById('kumamon-rate');
+            if (!jpyEl || !rateEl) return;
+            const jpy = parseFloat(jpyEl.value);
+            const rate = parseFloat(rateEl.value);
+            const modeEl = document.querySelector('input[name="kumamon-mode"]:checked');
+            const mode = modeEl ? modeEl.value : 'designated';
+            const jpyNum = Number.isFinite(jpy) && jpy >= 0 ? jpy : 0;
+            const rateNum = Number.isFinite(rate) && rate > 0 ? rate : 0;
+            const twd = jpyNum * rateNum;
+            const fee = twd * 0.015;
+            let r25 = 0;
+            let r6 = 0;
+            if (mode === 'designated') {
+                r25 = twd * 0.025;
+                r6 = Math.min(twd * 0.06, 500);
+            } else {
+                r25 = twd * 0.025;
+                r6 = 0;
+            }
+            const total = r25 + r6;
+            const net = total - fee;
+            const fmt = function (n) {
+                const v = Math.round(n * 100) / 100;
+                return 'NT$ ' + v.toLocaleString('zh-TW', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            };
+            document.getElementById('kumamon-out-twd').textContent = fmt(twd);
+            document.getElementById('kumamon-out-r25').textContent = fmt(r25);
+            document.getElementById('kumamon-out-r6').textContent = mode === 'designated' ? fmt(r6) : 'NT$ 0.00';
+            document.getElementById('kumamon-out-total').textContent = fmt(total);
+            document.getElementById('kumamon-out-fee').textContent = fmt(fee) + '（帳單收取）';
+            document.getElementById('kumamon-out-net').textContent = fmt(net);
+            const capNote = document.getElementById('kumamon-out-capnote');
+            if (mode === 'designated' && twd * 0.06 > 500 + 1e-9) {
+                capNote.textContent = '加碼 6% 若未設上限約為 ' + fmt(twd * 0.06) + '，已套用每期加碼上限 NT$500。';
+            } else if (mode === 'designated') {
+                capNote.textContent = '加碼 6% 尚未達每期上限 NT$500。';
+            } else {
+                capNote.textContent = '「僅日本一般」不含指定店加碼 6%。';
+            }
+        }
+
+        function syncSharedJpy(sourceId) {
+            const bankEl = document.getElementById('bank-jpy');
+            const ppEl = document.getElementById('pp-jpy');
+            if (!bankEl || !ppEl) return;
+            const sourceEl = sourceId === 'pp-jpy' ? ppEl : bankEl;
+            const value = sourceEl.value;
+            if (bankEl.value !== value) bankEl.value = value;
+            if (ppEl.value !== value) ppEl.value = value;
+            calcBankCompare();
+            calcPayPayCompare();
+        }
+
+        function calcBankCompare() {
+            const jpyNum = Math.max(0, parseFloat(document.getElementById('bank-jpy')?.value) || 0);
+            const cashRate = Math.max(0, parseFloat(document.getElementById('bank-cash-rate')?.value) || 0);
+            const fixedConfig = {
+                a: { name: '玉山', rewardPct: 0.025, feePct: 0.015, roundTwd: false, roundReward: false, roundFee: false },
+                b: { name: '台新', rewardPct: 0.033, feePct: 0.015, roundTwd: true, roundReward: true, roundFee: true }
+            };
+
+            const getCard = function(prefix) {
+                const cfg = fixedConfig[prefix];
+                const rate = Math.max(0, parseFloat(document.getElementById(`bank-${prefix}-rate`)?.value) || 0);
+                const twdRaw = jpyNum * rate;
+                const twd = cfg.roundTwd ? Math.round(twdRaw) : twdRaw;
+                let reward = twd * cfg.rewardPct;
+                if (cfg.roundReward) {
+                    reward = Math.floor(reward);
+                }
+                const feeRaw = (jpyNum * cfg.feePct) * rate;
+                const fee = cfg.roundFee ? Math.round(feeRaw) : feeRaw;
+                const cost = twd + fee - reward;
+                return { name: cfg.name, twd, reward, fee, cost };
+            };
+
+            const a = getCard('a');
+            const b = getCard('b');
+
+            const fmt = function (n) {
+                const v = Math.round(n * 100) / 100;
+                return 'NT$ ' + v.toLocaleString('zh-TW', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            };
+
+            document.getElementById('bank-head-a').textContent = a.name;
+            document.getElementById('bank-head-b').textContent = b.name;
+            document.getElementById('bank-a-twd').textContent = fmt(a.twd);
+            document.getElementById('bank-b-twd').textContent = fmt(b.twd);
+            document.getElementById('bank-a-cb').textContent = fmt(a.reward);
+            document.getElementById('bank-b-cb').textContent = fmt(b.reward);
+            document.getElementById('bank-a-fee').textContent = fmt(a.fee);
+            document.getElementById('bank-b-fee').textContent = fmt(b.fee);
+            document.getElementById('bank-a-cost').textContent = fmt(a.cost);
+            document.getElementById('bank-b-cost').textContent = fmt(b.cost);
+            document.getElementById('bank-cash-cost').textContent = fmt(jpyNum * cashRate);
+
+            const recommendEl = document.getElementById('bank-recommend');
+            if (Math.abs(a.cost - b.cost) < 0.01) {
+                recommendEl.textContent = '兩張卡預估最終成本幾乎相同。';
+            } else if (a.cost < b.cost) {
+                recommendEl.textContent = `建議刷 ${a.name}，預估最終成本少約 ${fmt(b.cost - a.cost)}。`;
+            } else {
+                recommendEl.textContent = `建議刷 ${b.name}，預估最終成本少約 ${fmt(a.cost - b.cost)}。`;
+            }
+
+            document.getElementById('bank-note').textContent = '玉山：台幣與手續費不四捨五入，且手續費先以日幣計算再換台幣；台新：回饋採無條件捨去、手續費採四捨五入。兩家皆含 1.5% 海外手續費。';
+        }
+
+        function calcPayPayCompare() {
+            const jpyNum = Math.max(0, parseFloat(document.getElementById('pp-jpy')?.value) || 0);
+            const cashRate = Math.max(0, parseFloat(document.getElementById('pp-cash-rate')?.value) || 0);
+            const fixedConfig = {
+                a: { name: '玉山', rewardPct: 0.035, cap: 100, roundDownInteger: false },
+                b: { name: '台新', rewardPct: 0.038, cap: 0, roundDownInteger: true }
+            };
+
+            const getCard = function(prefix) {
+                const cfg = fixedConfig[prefix];
+                const name = cfg.name;
+                const rate = Math.max(0, parseFloat(document.getElementById(`pp-${prefix}-rate`)?.value) || 0);
+                const rewardPct = cfg.rewardPct;
+                const cap = cfg.cap;
+                const twd = Math.round(jpyNum * rate);
+                let rawReward = twd * rewardPct;
+                if (cfg.roundDownInteger) {
+                    rawReward = Math.floor(rawReward);
+                }
+                const reward = cap > 0 ? Math.min(rawReward, cap) : rawReward;
+                const cost = twd - reward;
+                const capApplied = cap > 0 && rawReward > cap + 1e-9;
+                return { name, twd, reward, cost, capApplied };
+            };
+
+            const a = getCard('a');
+            const b = getCard('b');
+
+            const fmt = function (n) {
+                const v = Math.round(n * 100) / 100;
+                return 'NT$ ' + v.toLocaleString('zh-TW', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            };
+
+            document.getElementById('pp-head-a').textContent = a.name;
+            document.getElementById('pp-head-b').textContent = b.name;
+            document.getElementById('pp-a-twd').textContent = fmt(a.twd);
+            document.getElementById('pp-b-twd').textContent = fmt(b.twd);
+            document.getElementById('pp-a-cb').textContent = fmt(a.reward);
+            document.getElementById('pp-b-cb').textContent = fmt(b.reward);
+            document.getElementById('pp-a-cost').textContent = fmt(a.cost);
+            document.getElementById('pp-b-cost').textContent = fmt(b.cost);
+            const cashCost = jpyNum * cashRate;
+            document.getElementById('pp-cash-cost').textContent = fmt(cashCost);
+
+            const recommendEl = document.getElementById('pp-recommend');
+            if (Math.abs(a.cost - b.cost) < 0.01) {
+                recommendEl.textContent = `兩張卡預估最終成本幾乎相同，可優先刷 ${a.reward >= b.reward ? a.name : b.name}。`;
+            } else if (a.cost < b.cost) {
+                recommendEl.textContent = `建議刷 ${a.name}，預估最終成本少約 ${fmt(b.cost - a.cost)}。`;
+            } else {
+                recommendEl.textContent = `建議刷 ${b.name}，預估最終成本少約 ${fmt(a.cost - b.cost)}。`;
+            }
+
+            const noteParts = [];
+            if (a.capApplied) noteParts.push(`${a.name} 已觸發回饋上限`);
+            if (b.capApplied) noteParts.push(`${b.name} 已觸發回饋上限`);
+            noteParts.push('台新回饋採無條件捨去到整數，玉山不捨去');
+            document.getElementById('pp-note').textContent = noteParts.length > 0
+                ? noteParts.join('；') + '。'
+                : '目前兩卡皆未觸發回饋上限。';
+        }
+
+        function showMainTab(tab) {
+            // 隱藏所有主分頁內容
+            const mainContents = document.querySelectorAll('.main-tab-content');
+            mainContents.forEach(c => c.classList.remove('active'));
+            
+            // 移除所有主分頁按鈕的 active 狀態
+            const mainBtns = document.querySelectorAll('.tab-btn');
+            mainBtns.forEach(b => b.classList.remove('active'));
+            
+            // 顯示選中的主分頁
+            document.getElementById(`main-tab-${tab}`).classList.add('active');
+            document.getElementById(`btn-main-${tab}`).classList.add('active');
+            
+            // 如果是行程分頁，顯示日期子分頁；否則隱藏
+            const dayTabsSection = document.getElementById('day-tabs-section');
+            if (tab === 'itinerary') {
+                dayTabsSection.style.display = 'block';
+                // 確保顯示第一個日期
+                if (!document.querySelector('.day-tab-btn.active')) {
+                    showDayTab(1);
+                }
+            } else {
+                dayTabsSection.style.display = 'none';
+            }
+        }
+        
+        function showDayTab(day) {
+            // 只在行程主分頁顯示時才切換日期
+            if (!document.getElementById('main-tab-itinerary').classList.contains('active')) {
+                return;
+            }
+            
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(c => c.classList.remove('active'));
+            const dayBtns = document.querySelectorAll('.day-tab-btn');
+            dayBtns.forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-${day}`).classList.add('active');
+            document.getElementById(`btn-day-${day}`).classList.add('active');
+            const btn = document.getElementById(`btn-day-${day}`);
+            if (btn) {
+                btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }
+        
+        function toggleCheck(el) {
+            const span = el.querySelector('span');
+            span.classList.toggle('checked-item');
+        }
+        
+        // 初始化：顯示行程分頁和第一天
+        window.addEventListener('DOMContentLoaded', function() {
+            showMainTab('itinerary');
+            showDayTab(1);
+            calcKumamonCashback();
+            calcBankCompare();
+            calcPayPayCompare();
+            const payPayBlock = document.getElementById('paypay-compare-block');
+            const cardsContainer = document.querySelector('#main-tab-cards .space-y-6');
+            if (payPayBlock && cardsContainer) {
+                cardsContainer.prepend(payPayBlock);
+            }
+        });
+    </script>
+</body>
+</html>
