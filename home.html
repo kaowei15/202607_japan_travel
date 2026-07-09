@@ -137,7 +137,7 @@
         </section>
 
         <!-- 行程詳細內容 -->
-        <section id="itinerary-container" class="bg-white rounded-2xl shadow-sm p-6 border border-slate-100 min-h-[400px]">
+        <section id="itinerary-container" class="bg-white rounded-2xl shadow-sm p-4 md:p-6 border border-slate-100 min-h-[400px]">
             
             <!-- 行程主分頁 -->
             <div id="main-tab-itinerary" class="main-tab-content active">
@@ -1089,10 +1089,11 @@
                 </h3>
                 <p class="text-sm text-slate-500 mb-4">統計需要幫別人帶的東西，勾選已買到的品項。</p>
 
-                <!-- 新增品項表單 -->
-                <div class="bg-pink-50 border border-pink-100 rounded-xl p-4 mb-6">
-                    <h4 class="text-sm font-bold text-pink-700 mb-3"><i class="fas fa-plus-circle mr-1"></i> 新增品項</h4>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mb-3">
+                <!-- 新增／修改品項表單 -->
+                <div id="shop-form-panel" class="bg-pink-50 border border-pink-100 rounded-xl p-4 mb-6">
+                    <h4 id="shop-form-title" class="text-sm font-bold text-pink-700 mb-3"><i class="fas fa-plus-circle mr-1"></i> 新增品項</h4>
+                    <input type="hidden" id="shop-edit-key" value="">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mb-3">
                         <input type="text" id="shop-person" placeholder="委託人" class="px-3 py-2 rounded-lg border border-pink-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
                         <select id="shop-category" class="px-3 py-2 rounded-lg border border-pink-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
                             <option value="藥妝">藥妝</option>
@@ -1101,16 +1102,21 @@
                             <option value="美妝">美妝</option>
                             <option value="其他">其他</option>
                         </select>
-                        <input type="text" id="shop-item" placeholder="品項名稱" class="px-3 py-2 rounded-lg border border-pink-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
+                        <input type="text" id="shop-item" placeholder="品項名稱" class="px-3 py-2 rounded-lg border border-pink-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300 sm:col-span-2 md:col-span-1">
                     </div>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mb-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mb-3">
                         <input type="number" id="shop-qty" placeholder="數量" value="1" min="1" class="px-3 py-2 rounded-lg border border-pink-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
                         <input type="text" id="shop-img-url" placeholder="圖片網址（選填）" class="px-3 py-2 rounded-lg border border-pink-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
                         <input type="text" id="shop-note" placeholder="備註（選填）" class="px-3 py-2 rounded-lg border border-pink-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
                     </div>
-                    <button onclick="addShoppingItem()" class="w-full px-5 py-2 bg-pink-600 text-white rounded-lg font-bold text-sm hover:bg-pink-700 transition-all">
-                        <i class="fas fa-plus mr-1"></i> 新增品項
-                    </button>
+                    <div class="flex gap-2">
+                        <button id="shop-submit-btn" onclick="saveShoppingItem()" class="flex-1 px-5 py-2 bg-pink-600 text-white rounded-lg font-bold text-sm hover:bg-pink-700 transition-all">
+                            <i class="fas fa-plus mr-1"></i> 新增品項
+                        </button>
+                        <button id="shop-cancel-edit" onclick="cancelEditShopping()" class="hidden px-5 py-2 bg-slate-200 text-slate-700 rounded-lg font-bold text-sm hover:bg-slate-300 transition-all">
+                            取消
+                        </button>
+                    </div>
                 </div>
 
                 <!-- 分類篩選 -->
@@ -1123,19 +1129,24 @@
                     <button onclick="filterShopping('其他')" class="shop-filter-btn px-3 py-1.5 rounded-full border border-slate-200 bg-slate-50 text-slate-700 text-xs font-bold transition-all" data-filter="其他">其他</button>
                 </div>
 
-                <!-- 代購項目表格 -->
-                <div class="overflow-x-auto">
+                <!-- 手機版卡片清單 -->
+                <div id="shopping-list-cards" class="md:hidden space-y-3">
+                    <p class="py-6 text-center text-slate-400 text-sm">載入中...</p>
+                </div>
+
+                <!-- 電腦版表格 -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-sm border-collapse">
                         <thead>
                             <tr class="bg-pink-50 text-pink-700">
-                                <th class="py-2 px-3 text-left rounded-tl-lg">✓</th>
-                                <th class="py-2 px-3 text-left">委託人</th>
-                                <th class="py-2 px-3 text-left">分類</th>
-                                <th class="py-2 px-3 text-left">品項</th>
-                                <th class="py-2 px-3 text-left">數量</th>
+                                <th class="py-2 px-3 text-left rounded-tl-lg cursor-pointer select-none hover:bg-pink-100 shop-sort-th" data-sort="checked" onclick="sortShoppingBy('checked')">✓<span class="sort-icon text-xs"></span></th>
+                                <th class="py-2 px-3 text-left cursor-pointer select-none hover:bg-pink-100 shop-sort-th" data-sort="person" onclick="sortShoppingBy('person')">委託人<span class="sort-icon text-xs"></span></th>
+                                <th class="py-2 px-3 text-left cursor-pointer select-none hover:bg-pink-100 shop-sort-th" data-sort="category" onclick="sortShoppingBy('category')">分類<span class="sort-icon text-xs"></span></th>
+                                <th class="py-2 px-3 text-left cursor-pointer select-none hover:bg-pink-100 shop-sort-th" data-sort="item" onclick="sortShoppingBy('item')">品項<span class="sort-icon text-xs"></span></th>
+                                <th class="py-2 px-3 text-left cursor-pointer select-none hover:bg-pink-100 shop-sort-th" data-sort="qty" onclick="sortShoppingBy('qty')">數量<span class="sort-icon text-xs"></span></th>
                                 <th class="py-2 px-3 text-left">圖片</th>
-                                <th class="py-2 px-3 text-left">備註</th>
-                                <th class="py-2 px-3 text-left rounded-tr-lg">刪除</th>
+                                <th class="py-2 px-3 text-left cursor-pointer select-none hover:bg-pink-100 shop-sort-th" data-sort="note" onclick="sortShoppingBy('note')">備註<span class="sort-icon text-xs"></span></th>
+                                <th class="py-2 px-3 text-left rounded-tr-lg">修改</th>
                             </tr>
                         </thead>
                         <tbody id="shopping-list-body">
@@ -1144,7 +1155,7 @@
                     </table>
                 </div>
 
-                <p class="text-xs text-slate-400 mt-4 italic">💡 品項與勾選狀態即時同步，所有人看到的清單一致。</p>
+                <p class="text-xs text-slate-400 mt-4 italic">💡 品項與勾選狀態即時同步，所有人看到的清單一致。電腦版可點標題欄排序（再點一次切換升降序）。</p>
             </div>
 
         </section>
@@ -1206,21 +1217,82 @@
         };
 
         let currentFilter = 'all';
+        let shoppingSort = { column: 'person', direction: 'asc' };
+        let shoppingEntries = [];
 
-        // 即時監聽 Firebase 資料變化，渲染清單
-        itemsRef.on('value', (snapshot) => {
-            const data = snapshot.val() || {};
+        function sortShoppingEntries(entries) {
+            const { column, direction } = shoppingSort;
+            const mul = direction === 'asc' ? 1 : -1;
+
+            return [...entries].sort(([, a], [, b]) => {
+                let cmp = 0;
+                switch (column) {
+                    case 'checked':
+                        cmp = Number(!!a.checked) - Number(!!b.checked);
+                        break;
+                    case 'person':
+                        cmp = (a.person || '').localeCompare(b.person || '', 'zh-Hant');
+                        break;
+                    case 'category':
+                        cmp = (a.category || '').localeCompare(b.category || '', 'zh-Hant');
+                        break;
+                    case 'item':
+                        cmp = (a.item || '').localeCompare(b.item || '', 'zh-Hant');
+                        break;
+                    case 'qty':
+                        cmp = (parseFloat(a.qty) || 0) - (parseFloat(b.qty) || 0);
+                        break;
+                    case 'note':
+                        cmp = (a.note || '').localeCompare(b.note || '', 'zh-Hant');
+                        break;
+                }
+                if (cmp === 0) {
+                    cmp = (a.person || '').localeCompare(b.person || '', 'zh-Hant');
+                    if (cmp === 0) cmp = (a.item || '').localeCompare(b.item || '', 'zh-Hant');
+                }
+                return cmp * mul;
+            });
+        }
+
+        function updateSortHeaders() {
+            document.querySelectorAll('.shop-sort-th').forEach((th) => {
+                const col = th.dataset.sort;
+                const icon = th.querySelector('.sort-icon');
+                if (!icon) return;
+                if (col === shoppingSort.column) {
+                    icon.textContent = shoppingSort.direction === 'asc' ? ' ↑' : ' ↓';
+                } else {
+                    icon.textContent = '';
+                }
+            });
+        }
+
+        function sortShoppingBy(column) {
+            if (shoppingSort.column === column) {
+                shoppingSort.direction = shoppingSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                shoppingSort.column = column;
+                shoppingSort.direction = 'asc';
+            }
+            renderShoppingList(shoppingEntries);
+        }
+
+        function renderShoppingList(entries) {
             const tbody = document.getElementById('shopping-list-body');
-            if (!tbody) return;
+            const cards = document.getElementById('shopping-list-cards');
+            if (!tbody || !cards) return;
 
-            const entries = Object.entries(data);
             if (entries.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="8" class="py-6 text-center text-slate-400 text-sm">尚無代購品項，從上方新增！</td></tr>';
+                cards.innerHTML = '<p class="py-6 text-center text-slate-400 text-sm">尚無代購品項，從上方新增！</p>';
+                updateSortHeaders();
                 return;
             }
 
+            const sorted = sortShoppingEntries(entries);
             tbody.innerHTML = '';
-            entries.forEach(([key, item]) => {
+            cards.innerHTML = '';
+            sorted.forEach(([key, item]) => {
                 const colorClass = categoryColors[item.category] || categoryColors['其他'];
                 const checked = item.checked ? 'checked' : '';
                 const rowClass = item.checked ? 'opacity-40 line-through' : '';
@@ -1230,62 +1302,117 @@
                     : '<span class="text-slate-300 text-xs">無圖</span>';
 
                 tbody.innerHTML += `
-                    <tr class="border-b border-slate-100 hover:bg-slate-50 shop-item ${rowClass}" data-category="${item.category}" data-key="${key}" style="${display}" onclick="toggleShoppingCheck(this)">
-                        <td class="py-2 px-3"><input type="checkbox" class="w-4 h-4 rounded border-slate-300" ${checked}></td>
+                    <tr class="border-b border-slate-100 hover:bg-slate-50 shop-item ${rowClass}" data-category="${item.category}" data-key="${key}" style="${display}">
+                        <td class="py-2 px-3"><input type="checkbox" class="w-4 h-4 rounded border-slate-300 cursor-pointer" ${checked} onchange="toggleShoppingCheckByKey('${key}', this)"></td>
                         <td class="py-2 px-3 font-medium">${item.person}</td>
                         <td class="py-2 px-3"><span class="px-2 py-0.5 rounded-full ${colorClass} text-xs">${item.category}</span></td>
                         <td class="py-2 px-3">${item.item}</td>
                         <td class="py-2 px-3">${item.qty}</td>
                         <td class="py-2 px-3">${imgHtml}</td>
                         <td class="py-2 px-3 text-slate-500">${item.note || ''}</td>
-                        <td class="py-2 px-3"><button onclick="deleteShoppingItem('${key}', event)" class="text-red-400 hover:text-red-600 text-xs"><i class="fas fa-trash-alt"></i></button></td>
+                        <td class="py-2 px-3"><button onclick="editShoppingItem('${key}', event)" class="text-blue-500 hover:text-blue-700 text-xs"><i class="fas fa-pen"></i></button></td>
                     </tr>
                 `;
+
+                cards.innerHTML += `
+                    <div class="shop-item border border-slate-200 rounded-xl p-3 bg-white shadow-sm ${rowClass}" data-category="${item.category}" data-key="${key}" style="${display}">
+                        <div class="flex items-start gap-3">
+                            <input type="checkbox" class="mt-0.5 w-5 h-5 shrink-0 rounded border-slate-300 cursor-pointer" ${checked} onchange="toggleShoppingCheckByKey('${key}', this)">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-start justify-between gap-2 mb-1">
+                                    <span class="font-bold text-slate-800">${item.person}</span>
+                                    <span class="px-2 py-0.5 rounded-full ${colorClass} text-xs shrink-0">${item.category}</span>
+                                </div>
+                                <p class="font-medium text-slate-700 break-words">${item.item}</p>
+                                <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs text-slate-500">
+                                    <span>數量：${item.qty}</span>
+                                    ${item.note ? `<span class="break-words">備註：${item.note}</span>` : ''}
+                                </div>
+                                ${item.img ? `<div class="mt-2">${imgHtml}</div>` : ''}
+                            </div>
+                            <button onclick="editShoppingItem('${key}', event)" class="text-blue-500 hover:text-blue-700 text-sm shrink-0 p-1"><i class="fas fa-pen"></i></button>
+                        </div>
+                    </div>
+                `;
             });
+            updateSortHeaders();
+        }
+
+        // 即時監聽 Firebase 資料變化，渲染清單
+        itemsRef.on('value', (snapshot) => {
+            const data = snapshot.val() || {};
+            shoppingEntries = Object.entries(data);
+            renderShoppingList(shoppingEntries);
         });
 
-        // 新增品項
-        function addShoppingItem() {
+        // 新增或修改品項
+        function saveShoppingItem() {
             const person = document.getElementById('shop-person').value.trim();
             const category = document.getElementById('shop-category').value;
             const item = document.getElementById('shop-item').value.trim();
             const qty = document.getElementById('shop-qty').value || '1';
             const img = document.getElementById('shop-img-url').value.trim();
             const note = document.getElementById('shop-note').value.trim();
+            const editKey = document.getElementById('shop-edit-key').value;
 
             if (!person || !item) {
                 alert('請至少填寫委託人和品項名稱');
                 return;
             }
 
-            itemsRef.push({
-                person, category, item, qty, img, note, checked: false,
-                createdAt: Date.now()
-            });
+            if (editKey) {
+                itemsRef.child(editKey).update({ person, category, item, qty, img, note });
+            } else {
+                itemsRef.push({
+                    person, category, item, qty, img, note, checked: false,
+                    createdAt: Date.now()
+                });
+            }
 
-            // 清空表單
+            resetShoppingForm();
+        }
+
+        function resetShoppingForm() {
+            document.getElementById('shop-edit-key').value = '';
             document.getElementById('shop-person').value = '';
+            document.getElementById('shop-category').value = '藥妝';
             document.getElementById('shop-item').value = '';
             document.getElementById('shop-qty').value = '1';
             document.getElementById('shop-img-url').value = '';
             document.getElementById('shop-note').value = '';
+            document.getElementById('shop-form-title').innerHTML = '<i class="fas fa-plus-circle mr-1"></i> 新增品項';
+            document.getElementById('shop-submit-btn').innerHTML = '<i class="fas fa-plus mr-1"></i> 新增品項';
+            document.getElementById('shop-cancel-edit').classList.add('hidden');
         }
 
-        // 勾選（同步到 Firebase）
-        function toggleShoppingCheck(row) {
-            const key = row.dataset.key;
-            const checkbox = row.querySelector('input[type="checkbox"]');
-            const newState = !checkbox.checked;
-            if (key) {
-                itemsRef.child(key).update({ checked: newState });
-            }
-        }
-
-        // 刪除品項
-        function deleteShoppingItem(key, event) {
+        function editShoppingItem(key, event) {
             event.stopPropagation();
-            if (confirm('確定要刪除這筆嗎？')) {
-                itemsRef.child(key).remove();
+            itemsRef.child(key).once('value', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) return;
+
+                document.getElementById('shop-edit-key').value = key;
+                document.getElementById('shop-person').value = data.person || '';
+                document.getElementById('shop-category').value = data.category || '藥妝';
+                document.getElementById('shop-item').value = data.item || '';
+                document.getElementById('shop-qty').value = data.qty || '1';
+                document.getElementById('shop-img-url').value = data.img || '';
+                document.getElementById('shop-note').value = data.note || '';
+                document.getElementById('shop-form-title').innerHTML = '<i class="fas fa-pen mr-1"></i> 修改品項';
+                document.getElementById('shop-submit-btn').innerHTML = '<i class="fas fa-save mr-1"></i> 儲存修改';
+                document.getElementById('shop-cancel-edit').classList.remove('hidden');
+                document.getElementById('shop-form-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        }
+
+        function cancelEditShopping() {
+            resetShoppingForm();
+        }
+
+        // 勾選（僅 checkbox 觸發，同步到 Firebase）
+        function toggleShoppingCheckByKey(key, checkbox) {
+            if (key) {
+                itemsRef.child(key).update({ checked: checkbox.checked });
             }
         }
 
@@ -1311,7 +1438,7 @@
 
         // 圖片放大
         function enlargeImg(img, event) {
-            event.stopPropagation();
+            if (event) event.stopPropagation();
             if (!img.src) return;
             const overlay = document.createElement('div');
             overlay.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4';
