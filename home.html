@@ -1129,8 +1129,24 @@
                     <button onclick="filterShopping('其他')" class="shop-filter-btn px-3 py-1.5 rounded-full border border-slate-200 bg-slate-50 text-slate-700 text-xs font-bold transition-all" data-filter="其他">其他</button>
                 </div>
 
+                <!-- 手機版排序 -->
+                <div class="md:hidden flex items-center gap-2 mb-3 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2">
+                    <span class="text-xs text-slate-500 shrink-0">排序</span>
+                    <select id="shop-sort-select" onchange="setShoppingSortColumn(this.value)" class="flex-1 min-w-0 px-2 py-1.5 rounded-md border border-slate-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-pink-300">
+                        <option value="checked">已購買</option>
+                        <option value="person">委託人</option>
+                        <option value="category">分類</option>
+                        <option value="item">品項</option>
+                        <option value="qty">數量</option>
+                        <option value="note">備註</option>
+                    </select>
+                    <button type="button" onclick="toggleShoppingSortDirection()" class="shrink-0 w-9 h-8 flex items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-pink-50 hover:text-pink-600 transition-all" title="切換升降序">
+                        <span id="shop-sort-dir-icon" class="text-sm font-bold">↑</span>
+                    </button>
+                </div>
+
                 <!-- 手機版卡片清單 -->
-                <div id="shopping-list-cards" class="md:hidden space-y-3">
+                <div id="shopping-list-cards" class="md:hidden space-y-2">
                     <p class="py-6 text-center text-slate-400 text-sm">載入中...</p>
                 </div>
 
@@ -1155,7 +1171,7 @@
                     </table>
                 </div>
 
-                <p class="text-xs text-slate-400 mt-4 italic">💡 品項與勾選狀態即時同步，所有人看到的清單一致。電腦版可點標題欄排序（再點一次切換升降序）。</p>
+                <p class="text-xs text-slate-400 mt-4 italic">💡 品項與勾選狀態即時同步，所有人看到的清單一致。可點標題欄或用手機排序列切換排序。</p>
             </div>
 
         </section>
@@ -1265,6 +1281,10 @@
                     icon.textContent = '';
                 }
             });
+            const select = document.getElementById('shop-sort-select');
+            const dirIcon = document.getElementById('shop-sort-dir-icon');
+            if (select) select.value = shoppingSort.column;
+            if (dirIcon) dirIcon.textContent = shoppingSort.direction === 'asc' ? '↑' : '↓';
         }
 
         function sortShoppingBy(column) {
@@ -1274,6 +1294,16 @@
                 shoppingSort.column = column;
                 shoppingSort.direction = 'asc';
             }
+            renderShoppingList(shoppingEntries);
+        }
+
+        function setShoppingSortColumn(column) {
+            shoppingSort.column = column;
+            renderShoppingList(shoppingEntries);
+        }
+
+        function toggleShoppingSortDirection() {
+            shoppingSort.direction = shoppingSort.direction === 'asc' ? 'desc' : 'asc';
             renderShoppingList(shoppingEntries);
         }
 
@@ -1300,6 +1330,12 @@
                 const imgHtml = item.img
                     ? `<img src="${item.img}" alt="商品圖" onclick="enlargeImg(this, event)" class="w-12 h-12 object-cover rounded border border-slate-200 cursor-pointer">`
                     : '<span class="text-slate-300 text-xs">無圖</span>';
+                const mobileImgHtml = item.img
+                    ? `<img src="${item.img}" alt="商品圖" onclick="enlargeImg(this, event)" class="w-14 h-14 object-cover rounded-md border border-slate-200 cursor-pointer shrink-0">`
+                    : '';
+                const mobileNoteHtml = item.note
+                    ? `<p class="text-[11px] text-slate-500 mt-0.5 leading-snug break-words">${item.note}</p>`
+                    : '';
 
                 tbody.innerHTML += `
                     <tr class="border-b border-slate-100 hover:bg-slate-50 shop-item ${rowClass}" data-category="${item.category}" data-key="${key}" style="${display}">
@@ -1315,22 +1351,20 @@
                 `;
 
                 cards.innerHTML += `
-                    <div class="shop-item border border-slate-200 rounded-xl p-3 bg-white shadow-sm ${rowClass}" data-category="${item.category}" data-key="${key}" style="${display}">
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" class="mt-0.5 w-5 h-5 shrink-0 rounded border-slate-300 cursor-pointer" ${checked} onchange="toggleShoppingCheckByKey('${key}', this)">
+                    <div class="shop-item border border-slate-200 rounded-lg px-2.5 py-2 bg-white ${rowClass}" data-category="${item.category}" data-key="${key}" style="${display}">
+                        <div class="flex items-start gap-2">
+                            <input type="checkbox" class="mt-1.5 w-4 h-4 shrink-0 rounded border-slate-300 cursor-pointer" ${checked} onchange="toggleShoppingCheckByKey('${key}', this)">
+                            ${mobileImgHtml}
                             <div class="flex-1 min-w-0">
-                                <div class="flex items-start justify-between gap-2 mb-1">
-                                    <span class="font-bold text-slate-800">${item.person}</span>
-                                    <span class="px-2 py-0.5 rounded-full ${colorClass} text-xs shrink-0">${item.category}</span>
+                                <div class="flex items-center gap-1.5 flex-wrap pr-5">
+                                    <span class="font-bold text-sm text-slate-800">${item.person}</span>
+                                    <span class="px-1.5 py-0 rounded-full ${colorClass} text-[10px] leading-5">${item.category}</span>
+                                    <span class="text-xs text-slate-500 font-semibold">×${item.qty}</span>
                                 </div>
-                                <p class="font-medium text-slate-700 break-words">${item.item}</p>
-                                <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs text-slate-500">
-                                    <span>數量：${item.qty}</span>
-                                    ${item.note ? `<span class="break-words">備註：${item.note}</span>` : ''}
-                                </div>
-                                ${item.img ? `<div class="mt-2">${imgHtml}</div>` : ''}
+                                <p class="text-sm text-slate-700 leading-snug break-words mt-0.5">${item.item}</p>
+                                ${mobileNoteHtml}
                             </div>
-                            <button onclick="editShoppingItem('${key}', event)" class="text-blue-500 hover:text-blue-700 text-sm shrink-0 p-1"><i class="fas fa-pen"></i></button>
+                            <button onclick="editShoppingItem('${key}', event)" class="shrink-0 -mr-0.5 -mt-0.5 p-1.5 text-blue-500 hover:text-blue-700"><i class="fas fa-pen text-xs"></i></button>
                         </div>
                     </div>
                 `;
