@@ -1089,9 +1089,33 @@
                 </h3>
                 <p class="text-sm text-slate-500 mb-4">統計需要幫別人帶的東西，勾選已買到的品項。</p>
 
+                <!-- 新增品項表單 -->
+                <div class="bg-pink-50 border border-pink-100 rounded-xl p-4 mb-6">
+                    <h4 class="text-sm font-bold text-pink-700 mb-3"><i class="fas fa-plus-circle mr-1"></i> 新增品項</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mb-3">
+                        <input type="text" id="shop-person" placeholder="委託人" class="px-3 py-2 rounded-lg border border-pink-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
+                        <select id="shop-category" class="px-3 py-2 rounded-lg border border-pink-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
+                            <option value="藥妝">藥妝</option>
+                            <option value="零食">零食</option>
+                            <option value="電器">電器</option>
+                            <option value="美妝">美妝</option>
+                            <option value="其他">其他</option>
+                        </select>
+                        <input type="text" id="shop-item" placeholder="品項名稱" class="px-3 py-2 rounded-lg border border-pink-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mb-3">
+                        <input type="number" id="shop-qty" placeholder="數量" value="1" min="1" class="px-3 py-2 rounded-lg border border-pink-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
+                        <input type="text" id="shop-img-url" placeholder="圖片網址（選填）" class="px-3 py-2 rounded-lg border border-pink-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
+                        <input type="text" id="shop-note" placeholder="備註（選填）" class="px-3 py-2 rounded-lg border border-pink-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
+                    </div>
+                    <button onclick="addShoppingItem()" class="w-full px-5 py-2 bg-pink-600 text-white rounded-lg font-bold text-sm hover:bg-pink-700 transition-all">
+                        <i class="fas fa-plus mr-1"></i> 新增品項
+                    </button>
+                </div>
+
                 <!-- 分類篩選 -->
                 <div class="flex flex-wrap gap-2 mb-4">
-                    <button onclick="filterShopping('all')" class="shop-filter-btn active px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-bold transition-all" data-filter="all">全部</button>
+                    <button onclick="filterShopping('all')" class="shop-filter-btn px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-bold transition-all ring-2 ring-pink-400" data-filter="all">全部</button>
                     <button onclick="filterShopping('藥妝')" class="shop-filter-btn px-3 py-1.5 rounded-full border border-green-200 bg-green-50 text-green-700 text-xs font-bold transition-all" data-filter="藥妝">藥妝</button>
                     <button onclick="filterShopping('零食')" class="shop-filter-btn px-3 py-1.5 rounded-full border border-amber-200 bg-amber-50 text-amber-700 text-xs font-bold transition-all" data-filter="零食">零食</button>
                     <button onclick="filterShopping('電器')" class="shop-filter-btn px-3 py-1.5 rounded-full border border-blue-200 bg-blue-50 text-blue-700 text-xs font-bold transition-all" data-filter="電器">電器</button>
@@ -1110,45 +1134,17 @@
                                 <th class="py-2 px-3 text-left">品項</th>
                                 <th class="py-2 px-3 text-left">數量</th>
                                 <th class="py-2 px-3 text-left">圖片</th>
-                                <th class="py-2 px-3 text-left rounded-tr-lg">備註</th>
+                                <th class="py-2 px-3 text-left">備註</th>
+                                <th class="py-2 px-3 text-left rounded-tr-lg">刪除</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <!-- 範例品項（請複製此格式新增） -->
-                            <!--
-                            <tr class="border-b border-slate-100 hover:bg-slate-50" onclick="toggleShoppingCheck(this)">
-                                <td class="py-2 px-3"><input type="checkbox" class="w-4 h-4 rounded border-slate-300"></td>
-                                <td class="py-2 px-3 font-medium">委託人名</td>
-                                <td class="py-2 px-3"><span class="px-2 py-0.5 rounded-full bg-pink-100 text-pink-700 text-xs">分類</span></td>
-                                <td class="py-2 px-3">品項名稱</td>
-                                <td class="py-2 px-3">1</td>
-                                <td class="py-2 px-3"><img src="圖片網址" alt="商品圖" onclick="enlargeImg(this, event)" class="w-12 h-12 object-cover rounded border border-slate-200 cursor-pointer"></td>
-                                <td class="py-2 px-3 text-slate-500">備註</td>
-                            </tr>
-                            -->
-                            <tr class="border-b border-slate-100 hover:bg-slate-50 shop-item" data-category="藥妝" data-id="item-1" onclick="toggleShoppingCheck(this)">
-                                <td class="py-2 px-3"><input type="checkbox" class="w-4 h-4 rounded border-slate-300"></td>
-                                <td class="py-2 px-3 font-medium">林佩玲</td>
-                                <td class="py-2 px-3"><span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs">藥妝</span></td>
-                                <td class="py-2 px-3">痠痛藥水</td>
-                                <td class="py-2 px-3">5</td>
-                                <td class="py-2 px-3"><img src="shopping-img/佩玲_痠痛藥水.jpg" alt="痠痛藥水" onclick="enlargeImg(this, event)" class="w-12 h-12 object-cover rounded border border-slate-200 cursor-pointer"></td>
-                                <td class="py-2 px-3 text-slate-500"></td>
-                            </tr>
-                            <tr class="border-b border-slate-100 hover:bg-slate-50 shop-item" data-category="藥妝" data-id="item-2" onclick="toggleShoppingCheck(this)">
-                                <td class="py-2 px-3"><input type="checkbox" class="w-4 h-4 rounded border-slate-300"></td>
-                                <td class="py-2 px-3 font-medium">林佩玲</td>
-                                <td class="py-2 px-3"><span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs">藥妝</span></td>
-                                <td class="py-2 px-3">眼藥水</td>
-                                <td class="py-2 px-3">5</td>
-                                <td class="py-2 px-3"><img src="shopping-img/佩玲_眼藥水.jpg" alt="眼藥水" onclick="enlargeImg(this, event)" class="w-12 h-12 object-cover rounded border border-slate-200 cursor-pointer"></td>
-                                <td class="py-2 px-3 text-slate-500"></td>
-                            </tr>
+                        <tbody id="shopping-list-body">
+                            <tr><td colspan="8" class="py-6 text-center text-slate-400 text-sm">載入中...</td></tr>
                         </tbody>
                     </table>
                 </div>
 
-                <p class="text-xs text-slate-400 mt-4 italic">💡 所有人看到的清單一致。勾選狀態僅存在各自的瀏覽器中。</p>
+                <p class="text-xs text-slate-400 mt-4 italic">💡 品項與勾選狀態即時同步，所有人看到的清單一致。</p>
             </div>
 
         </section>
@@ -1198,24 +1194,134 @@
             databaseURL: "https://jp-9c9f8-default-rtdb.asia-southeast1.firebasedatabase.app/"
         });
         const db = firebase.database();
-        const checkRef = db.ref('shopping_checks');
+        const itemsRef = db.ref('shopping_items');
 
-        // 頁面載入時從 Firebase 讀取勾選狀態
-        checkRef.on('value', (snapshot) => {
+        // 分類顏色對應
+        const categoryColors = {
+            '藥妝': 'bg-green-100 text-green-700',
+            '零食': 'bg-amber-100 text-amber-700',
+            '電器': 'bg-blue-100 text-blue-700',
+            '美妝': 'bg-purple-100 text-purple-700',
+            '其他': 'bg-slate-100 text-slate-700'
+        };
+
+        let currentFilter = 'all';
+
+        // 即時監聽 Firebase 資料變化，渲染清單
+        itemsRef.on('value', (snapshot) => {
             const data = snapshot.val() || {};
-            document.querySelectorAll('.shop-item').forEach(row => {
-                const id = row.dataset.id;
-                if (!id) return;
-                const checkbox = row.querySelector('input[type="checkbox"]');
-                if (data[id]) {
-                    checkbox.checked = true;
-                    row.classList.add('opacity-40', 'line-through');
-                } else {
-                    checkbox.checked = false;
-                    row.classList.remove('opacity-40', 'line-through');
-                }
+            const tbody = document.getElementById('shopping-list-body');
+            if (!tbody) return;
+
+            const entries = Object.entries(data);
+            if (entries.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="py-6 text-center text-slate-400 text-sm">尚無代購品項，從上方新增！</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            entries.forEach(([key, item]) => {
+                const colorClass = categoryColors[item.category] || categoryColors['其他'];
+                const checked = item.checked ? 'checked' : '';
+                const rowClass = item.checked ? 'opacity-40 line-through' : '';
+                const display = (currentFilter === 'all' || item.category === currentFilter) ? '' : 'display:none;';
+                const imgHtml = item.img
+                    ? `<img src="${item.img}" alt="商品圖" onclick="enlargeImg(this, event)" class="w-12 h-12 object-cover rounded border border-slate-200 cursor-pointer">`
+                    : '<span class="text-slate-300 text-xs">無圖</span>';
+
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50 shop-item ${rowClass}" data-category="${item.category}" data-key="${key}" style="${display}" onclick="toggleShoppingCheck(this)">
+                        <td class="py-2 px-3"><input type="checkbox" class="w-4 h-4 rounded border-slate-300" ${checked}></td>
+                        <td class="py-2 px-3 font-medium">${item.person}</td>
+                        <td class="py-2 px-3"><span class="px-2 py-0.5 rounded-full ${colorClass} text-xs">${item.category}</span></td>
+                        <td class="py-2 px-3">${item.item}</td>
+                        <td class="py-2 px-3">${item.qty}</td>
+                        <td class="py-2 px-3">${imgHtml}</td>
+                        <td class="py-2 px-3 text-slate-500">${item.note || ''}</td>
+                        <td class="py-2 px-3"><button onclick="deleteShoppingItem('${key}', event)" class="text-red-400 hover:text-red-600 text-xs"><i class="fas fa-trash-alt"></i></button></td>
+                    </tr>
+                `;
             });
         });
+
+        // 新增品項
+        function addShoppingItem() {
+            const person = document.getElementById('shop-person').value.trim();
+            const category = document.getElementById('shop-category').value;
+            const item = document.getElementById('shop-item').value.trim();
+            const qty = document.getElementById('shop-qty').value || '1';
+            const img = document.getElementById('shop-img-url').value.trim();
+            const note = document.getElementById('shop-note').value.trim();
+
+            if (!person || !item) {
+                alert('請至少填寫委託人和品項名稱');
+                return;
+            }
+
+            itemsRef.push({
+                person, category, item, qty, img, note, checked: false,
+                createdAt: Date.now()
+            });
+
+            // 清空表單
+            document.getElementById('shop-person').value = '';
+            document.getElementById('shop-item').value = '';
+            document.getElementById('shop-qty').value = '1';
+            document.getElementById('shop-img-url').value = '';
+            document.getElementById('shop-note').value = '';
+        }
+
+        // 勾選（同步到 Firebase）
+        function toggleShoppingCheck(row) {
+            const key = row.dataset.key;
+            const checkbox = row.querySelector('input[type="checkbox"]');
+            const newState = !checkbox.checked;
+            if (key) {
+                itemsRef.child(key).update({ checked: newState });
+            }
+        }
+
+        // 刪除品項
+        function deleteShoppingItem(key, event) {
+            event.stopPropagation();
+            if (confirm('確定要刪除這筆嗎？')) {
+                itemsRef.child(key).remove();
+            }
+        }
+
+        // 分類篩選
+        function filterShopping(category) {
+            currentFilter = category;
+            const items = document.querySelectorAll('.shop-item');
+            items.forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            const btns = document.querySelectorAll('.shop-filter-btn');
+            btns.forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-pink-400');
+                if (btn.dataset.filter === category) {
+                    btn.classList.add('ring-2', 'ring-pink-400');
+                }
+            });
+        }
+
+        // 圖片放大
+        function enlargeImg(img, event) {
+            event.stopPropagation();
+            if (!img.src) return;
+            const overlay = document.createElement('div');
+            overlay.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4';
+            overlay.onclick = () => overlay.remove();
+            const bigImg = document.createElement('img');
+            bigImg.src = img.src;
+            bigImg.className = 'max-w-full max-h-[80vh] rounded-lg shadow-2xl';
+            overlay.appendChild(bigImg);
+            document.body.appendChild(overlay);
+        }
     </script>
 
     <script>
@@ -1492,50 +1598,6 @@
         function toggleCheck(el) {
             const span = el.querySelector('span');
             span.classList.toggle('checked-item');
-        }
-
-        function toggleShoppingCheck(row) {
-            const checkbox = row.querySelector('input[type="checkbox"]');
-            checkbox.checked = !checkbox.checked;
-            row.classList.toggle('opacity-40');
-            row.classList.toggle('line-through');
-            // 同步到 Firebase
-            const id = row.dataset.id;
-            if (id) {
-                checkRef.child(id).set(checkbox.checked);
-            }
-        }
-
-        function filterShopping(category) {
-            const items = document.querySelectorAll('.shop-item');
-            items.forEach(item => {
-                if (category === 'all' || item.dataset.category === category) {
-                    item.style.display = '';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-            // 更新按鈕狀態
-            const btns = document.querySelectorAll('.shop-filter-btn');
-            btns.forEach(btn => {
-                btn.classList.remove('ring-2', 'ring-pink-400', 'font-black');
-                if (btn.dataset.filter === category) {
-                    btn.classList.add('ring-2', 'ring-pink-400', 'font-black');
-                }
-            });
-        }
-
-        function enlargeImg(img, event) {
-            event.stopPropagation();
-            if (!img.src || img.classList.contains('hidden')) return;
-            const overlay = document.createElement('div');
-            overlay.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4';
-            overlay.onclick = () => overlay.remove();
-            const bigImg = document.createElement('img');
-            bigImg.src = img.src;
-            bigImg.className = 'max-w-full max-h-[80vh] rounded-lg shadow-2xl';
-            overlay.appendChild(bigImg);
-            document.body.appendChild(overlay);
         }
         
         // 初始化：顯示行程分頁和第一天
