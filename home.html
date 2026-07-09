@@ -1097,9 +1097,9 @@
                         <input type="text" id="shop-person" placeholder="委託人" class="px-3 py-2 rounded-lg border border-pink-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
                         <select id="shop-category" class="px-3 py-2 rounded-lg border border-pink-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
                             <option value="藥妝">藥妝</option>
+                            <option value="動漫">動漫</option>
                             <option value="零食">零食</option>
-                            <option value="電器">電器</option>
-                            <option value="美妝">美妝</option>
+                            <option value="衣服">衣服</option>
                             <option value="其他">其他</option>
                         </select>
                         <input type="text" id="shop-item" placeholder="品項名稱" class="px-3 py-2 rounded-lg border border-pink-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300 sm:col-span-2 md:col-span-1">
@@ -1123,9 +1123,9 @@
                 <div class="flex flex-wrap gap-2 mb-4">
                     <button onclick="filterShopping('all')" class="shop-filter-btn px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-bold transition-all ring-2 ring-pink-400" data-filter="all">全部</button>
                     <button onclick="filterShopping('藥妝')" class="shop-filter-btn px-3 py-1.5 rounded-full border border-green-200 bg-green-50 text-green-700 text-xs font-bold transition-all" data-filter="藥妝">藥妝</button>
+                    <button onclick="filterShopping('動漫')" class="shop-filter-btn px-3 py-1.5 rounded-full border border-blue-200 bg-blue-50 text-blue-700 text-xs font-bold transition-all" data-filter="動漫">動漫</button>
                     <button onclick="filterShopping('零食')" class="shop-filter-btn px-3 py-1.5 rounded-full border border-amber-200 bg-amber-50 text-amber-700 text-xs font-bold transition-all" data-filter="零食">零食</button>
-                    <button onclick="filterShopping('電器')" class="shop-filter-btn px-3 py-1.5 rounded-full border border-blue-200 bg-blue-50 text-blue-700 text-xs font-bold transition-all" data-filter="電器">電器</button>
-                    <button onclick="filterShopping('美妝')" class="shop-filter-btn px-3 py-1.5 rounded-full border border-purple-200 bg-purple-50 text-purple-700 text-xs font-bold transition-all" data-filter="美妝">美妝</button>
+                    <button onclick="filterShopping('衣服')" class="shop-filter-btn px-3 py-1.5 rounded-full border border-purple-200 bg-purple-50 text-purple-700 text-xs font-bold transition-all" data-filter="衣服">衣服</button>
                     <button onclick="filterShopping('其他')" class="shop-filter-btn px-3 py-1.5 rounded-full border border-slate-200 bg-slate-50 text-slate-700 text-xs font-bold transition-all" data-filter="其他">其他</button>
                 </div>
 
@@ -1226,9 +1226,9 @@
         // 分類顏色對應
         const categoryColors = {
             '藥妝': 'bg-green-100 text-green-700',
+            '動漫': 'bg-blue-100 text-blue-700',
             '零食': 'bg-amber-100 text-amber-700',
-            '電器': 'bg-blue-100 text-blue-700',
-            '美妝': 'bg-purple-100 text-purple-700',
+            '衣服': 'bg-purple-100 text-purple-700',
             '其他': 'bg-slate-100 text-slate-700'
         };
 
