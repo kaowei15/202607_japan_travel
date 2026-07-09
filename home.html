@@ -121,6 +121,7 @@
                 <button onclick="showMainTab('flight')" id="btn-main-flight" class="tab-btn shrink-0 flex-1 px-5 py-2 rounded-lg border border-slate-200 bg-white font-bold transition-all text-sm"><i class="fas fa-plane mr-1"></i> 飛機資訊</button>
                 <button onclick="showMainTab('cards')" id="btn-main-cards" class="tab-btn shrink-0 flex-1 px-5 py-2 rounded-lg border border-slate-200 bg-white font-bold transition-all text-sm"><i class="fas fa-credit-card mr-1"></i> 刷卡攻略</button>
                 <button onclick="showMainTab('vjw')" id="btn-main-vjw" class="tab-btn shrink-0 flex-1 px-5 py-2 rounded-lg border border-slate-200 bg-white font-bold transition-all text-sm"><i class="fas fa-qrcode mr-1"></i> VJW 資料</button>
+                <button onclick="showMainTab('shopping')" id="btn-main-shopping" class="tab-btn shrink-0 flex-1 px-5 py-2 rounded-lg border border-slate-200 bg-white font-bold transition-all text-sm"><i class="fas fa-shopping-bag mr-1"></i> 代購清單</button>
             </div>
         </section>
 
@@ -1080,6 +1081,76 @@
                     </div>
                 </div>
             </div>
+
+            <!-- 代購清單主分頁 -->
+            <div id="main-tab-shopping" class="main-tab-content">
+                <h3 class="text-xl font-bold text-pink-600 mb-6 flex items-center">
+                    <i class="fas fa-shopping-bag mr-2"></i> 代購清單
+                </h3>
+                <p class="text-sm text-slate-500 mb-4">統計需要幫別人帶的東西，勾選已買到的品項。</p>
+
+                <!-- 分類篩選 -->
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <button onclick="filterShopping('all')" class="shop-filter-btn active px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-bold transition-all" data-filter="all">全部</button>
+                    <button onclick="filterShopping('藥妝')" class="shop-filter-btn px-3 py-1.5 rounded-full border border-green-200 bg-green-50 text-green-700 text-xs font-bold transition-all" data-filter="藥妝">藥妝</button>
+                    <button onclick="filterShopping('零食')" class="shop-filter-btn px-3 py-1.5 rounded-full border border-amber-200 bg-amber-50 text-amber-700 text-xs font-bold transition-all" data-filter="零食">零食</button>
+                    <button onclick="filterShopping('電器')" class="shop-filter-btn px-3 py-1.5 rounded-full border border-blue-200 bg-blue-50 text-blue-700 text-xs font-bold transition-all" data-filter="電器">電器</button>
+                    <button onclick="filterShopping('美妝')" class="shop-filter-btn px-3 py-1.5 rounded-full border border-purple-200 bg-purple-50 text-purple-700 text-xs font-bold transition-all" data-filter="美妝">美妝</button>
+                    <button onclick="filterShopping('其他')" class="shop-filter-btn px-3 py-1.5 rounded-full border border-slate-200 bg-slate-50 text-slate-700 text-xs font-bold transition-all" data-filter="其他">其他</button>
+                </div>
+
+                <!-- 代購項目表格 -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm border-collapse">
+                        <thead>
+                            <tr class="bg-pink-50 text-pink-700">
+                                <th class="py-2 px-3 text-left rounded-tl-lg">✓</th>
+                                <th class="py-2 px-3 text-left">委託人</th>
+                                <th class="py-2 px-3 text-left">分類</th>
+                                <th class="py-2 px-3 text-left">品項</th>
+                                <th class="py-2 px-3 text-left">數量</th>
+                                <th class="py-2 px-3 text-left">圖片</th>
+                                <th class="py-2 px-3 text-left rounded-tr-lg">備註</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 範例品項（請複製此格式新增） -->
+                            <!--
+                            <tr class="border-b border-slate-100 hover:bg-slate-50" onclick="toggleShoppingCheck(this)">
+                                <td class="py-2 px-3"><input type="checkbox" class="w-4 h-4 rounded border-slate-300"></td>
+                                <td class="py-2 px-3 font-medium">委託人名</td>
+                                <td class="py-2 px-3"><span class="px-2 py-0.5 rounded-full bg-pink-100 text-pink-700 text-xs">分類</span></td>
+                                <td class="py-2 px-3">品項名稱</td>
+                                <td class="py-2 px-3">1</td>
+                                <td class="py-2 px-3"><img src="圖片網址" alt="商品圖" onclick="enlargeImg(this, event)" class="w-12 h-12 object-cover rounded border border-slate-200 cursor-pointer"></td>
+                                <td class="py-2 px-3 text-slate-500">備註</td>
+                            </tr>
+                            -->
+                            <tr class="border-b border-slate-100 hover:bg-slate-50 shop-item" data-category="藥妝" data-id="item-1" onclick="toggleShoppingCheck(this)">
+                                <td class="py-2 px-3"><input type="checkbox" class="w-4 h-4 rounded border-slate-300"></td>
+                                <td class="py-2 px-3 font-medium">林佩玲</td>
+                                <td class="py-2 px-3"><span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs">藥妝</span></td>
+                                <td class="py-2 px-3">痠痛藥水</td>
+                                <td class="py-2 px-3">5</td>
+                                <td class="py-2 px-3"><img src="shopping-img/佩玲_痠痛藥水.jpg" alt="痠痛藥水" onclick="enlargeImg(this, event)" class="w-12 h-12 object-cover rounded border border-slate-200 cursor-pointer"></td>
+                                <td class="py-2 px-3 text-slate-500"></td>
+                            </tr>
+                            <tr class="border-b border-slate-100 hover:bg-slate-50 shop-item" data-category="藥妝" data-id="item-2" onclick="toggleShoppingCheck(this)">
+                                <td class="py-2 px-3"><input type="checkbox" class="w-4 h-4 rounded border-slate-300"></td>
+                                <td class="py-2 px-3 font-medium">林佩玲</td>
+                                <td class="py-2 px-3"><span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs">藥妝</span></td>
+                                <td class="py-2 px-3">眼藥水</td>
+                                <td class="py-2 px-3">5</td>
+                                <td class="py-2 px-3"><img src="shopping-img/佩玲_眼藥水.jpg" alt="眼藥水" onclick="enlargeImg(this, event)" class="w-12 h-12 object-cover rounded border border-slate-200 cursor-pointer"></td>
+                                <td class="py-2 px-3 text-slate-500"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p class="text-xs text-slate-400 mt-4 italic">💡 所有人看到的清單一致。勾選狀態僅存在各自的瀏覽器中。</p>
+            </div>
+
         </section>
 
         <!-- 工具欄 -->
@@ -1117,6 +1188,35 @@
     <footer class="mt-8 py-8 bg-slate-800 text-center text-slate-400 text-xs">
         <p>祝旅途平安順心！ ❤️</p>
     </footer>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script>
+        // Firebase 初始化
+        firebase.initializeApp({
+            databaseURL: "https://jp-9c9f8-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        });
+        const db = firebase.database();
+        const checkRef = db.ref('shopping_checks');
+
+        // 頁面載入時從 Firebase 讀取勾選狀態
+        checkRef.on('value', (snapshot) => {
+            const data = snapshot.val() || {};
+            document.querySelectorAll('.shop-item').forEach(row => {
+                const id = row.dataset.id;
+                if (!id) return;
+                const checkbox = row.querySelector('input[type="checkbox"]');
+                if (data[id]) {
+                    checkbox.checked = true;
+                    row.classList.add('opacity-40', 'line-through');
+                } else {
+                    checkbox.checked = false;
+                    row.classList.remove('opacity-40', 'line-through');
+                }
+            });
+        });
+    </script>
 
     <script>
         function calcKumamonCashback() {
@@ -1392,6 +1492,50 @@
         function toggleCheck(el) {
             const span = el.querySelector('span');
             span.classList.toggle('checked-item');
+        }
+
+        function toggleShoppingCheck(row) {
+            const checkbox = row.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            row.classList.toggle('opacity-40');
+            row.classList.toggle('line-through');
+            // 同步到 Firebase
+            const id = row.dataset.id;
+            if (id) {
+                checkRef.child(id).set(checkbox.checked);
+            }
+        }
+
+        function filterShopping(category) {
+            const items = document.querySelectorAll('.shop-item');
+            items.forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            // 更新按鈕狀態
+            const btns = document.querySelectorAll('.shop-filter-btn');
+            btns.forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-pink-400', 'font-black');
+                if (btn.dataset.filter === category) {
+                    btn.classList.add('ring-2', 'ring-pink-400', 'font-black');
+                }
+            });
+        }
+
+        function enlargeImg(img, event) {
+            event.stopPropagation();
+            if (!img.src || img.classList.contains('hidden')) return;
+            const overlay = document.createElement('div');
+            overlay.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4';
+            overlay.onclick = () => overlay.remove();
+            const bigImg = document.createElement('img');
+            bigImg.src = img.src;
+            bigImg.className = 'max-w-full max-h-[80vh] rounded-lg shadow-2xl';
+            overlay.appendChild(bigImg);
+            document.body.appendChild(overlay);
         }
         
         // 初始化：顯示行程分頁和第一天
