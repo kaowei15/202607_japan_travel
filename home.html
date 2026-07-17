@@ -1859,7 +1859,7 @@
             const tripDates = [
                 { date: '2026-07-18', day: 1, city: '大阪', lat: 34.6937, lon: 135.5023 },
                 { date: '2026-07-19', day: 2, city: '大阪', lat: 34.6937, lon: 135.5023 },
-                { date: '2026-07-20', day: 3, city: '奈良', lat: 34.6851, lon: 135.8048 },
+                { date: '2026-07-20', day: 3, city: '奈良', lat: 34.6851, lon: 135.8048, city2: '大阪', lat2: 34.6937, lon2: 135.5023 },
                 { date: '2026-07-21', day: 4, city: '大阪', lat: 34.6937, lon: 135.5023 },
                 { date: '2026-07-22', day: 5, city: '大阪', lat: 34.6937, lon: 135.5023, city2: '京都', lat2: 34.9856, lon2: 135.7682 },
                 { date: '2026-07-23', day: 6, city: '京都', lat: 34.9856, lon: 135.7682 },
@@ -1897,50 +1897,75 @@
             try {
                 const startDate = tripDates[0].date;
                 const endDate = tripDates[tripDates.length - 1].date;
-                const dailyParams = 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max,sunrise,sunset';
-                const hourlyParams = 'temperature_2m,precipitation_probability,weather_code,apparent_temperature';
+                const jmaDailyParams = 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,sunrise,sunset';
+                const jmaHourlyParams = 'temperature_2m,precipitation,weather_code,apparent_temperature';
+                const rainDailyParams = 'precipitation_probability_max,uv_index_max';
+                const rainHourlyParams = 'precipitation_probability';
                 
-                const buildUrl = (lat, lon) => `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=${dailyParams}&hourly=${hourlyParams}&timezone=Asia/Tokyo&start_date=${startDate}&end_date=${endDate}`;
+                // JMA endpoint（溫度、天氣狀況更貼近日本氣象廳）
+                const buildJmaUrl = (lat, lon) => `https://api.open-meteo.com/v1/jma?latitude=${lat}&longitude=${lon}&daily=${jmaDailyParams}&hourly=${jmaHourlyParams}&timezone=Asia/Tokyo&start_date=${startDate}&end_date=${endDate}`;
+                // 通用 endpoint（補降雨機率，JMA 不提供此欄位）
+                const buildRainUrl = (lat, lon) => `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=${rainDailyParams}&hourly=${rainHourlyParams}&timezone=Asia/Tokyo&start_date=${startDate}&end_date=${endDate}`;
 
-                const urls = [
-                    buildUrl(34.6937, 135.5023),  // 大阪
-                    buildUrl(34.9856, 135.7682),  // 京都
-                    buildUrl(34.4320, 135.2304),  // 關西機場
-                    buildUrl(34.6851, 135.8048)   // 奈良
+                const locations = [
+                    { lat: 34.6937, lon: 135.5023 },  // 大阪
+                    { lat: 34.9856, lon: 135.7682 },  // 京都
+                    { lat: 34.4320, lon: 135.2304 },  // 關西機場
+                    { lat: 34.6851, lon: 135.8048 }   // 奈良
                 ];
 
-                const [osakaData, kyotoData, kixData, naraData] = await Promise.all(
-                    urls.map(u => fetch(u).then(r => r.json()))
-                );
+                const allFetches = locations.flatMap(loc => [
+                    fetch(buildJmaUrl(loc.lat, loc.lon)).then(r => r.json()).catch(() => ({daily:{time:[]},hourly:{time:[]}})),
+                    fetch(buildRainUrl(loc.lat, loc.lon)).then(r => r.json()).catch(() => ({daily:{},hourly:{}}))
+                ]);
 
-                if (!osakaData.daily || !osakaData.daily.time || osakaData.daily.time.length === 0) return;
+                const results = await Promise.all(allFetches);
+                // [osakaJma, osakaRain, kyotoJma, kyotoRain, kixJma, kixRain, naraJma, naraRain]
+                const [osakaJma, osakaRain, kyotoJma, kyotoRain, kixJma, kixRain, naraJma, naraRain] = results;
 
-                const getDaily = (data, date) => {
-                    const i = data.daily.time.indexOf(date);
+                if (!osakaJma.daily || !osakaJma.daily.time || osakaJma.daily.time.length === 0) return;
+
+                // 合併 JMA 資料 + 降雨機率
+                const mergeData = (jma, rain) => ({ jma, rain });
+                const osakaData = mergeData(osakaJma, osakaRain);
+                const kyotoData = mergeData(kyotoJma, kyotoRain);
+                const kixData = mergeData(kixJma, kixRain);
+                const naraData = mergeData(naraJma, naraRain);
+
+                const getDaily = (merged, date) => {
+                    if (!merged.jma.daily || !merged.jma.daily.time) return null;
+                    const i = merged.jma.daily.time.indexOf(date);
                     if (i === -1) return null;
+                    const rainProb = (merged.rain && merged.rain.daily && merged.rain.daily.precipitation_probability_max) 
+                        ? (merged.rain.daily.precipitation_probability_max[i] || 0) : 0;
+                    const sunrise = (merged.jma.daily.sunrise && merged.jma.daily.sunrise[i]) ? merged.jma.daily.sunrise[i].slice(11, 16) : '';
+                    const sunset = (merged.jma.daily.sunset && merged.jma.daily.sunset[i]) ? merged.jma.daily.sunset[i].slice(11, 16) : '';
                     return {
-                        code: data.daily.weather_code[i],
-                        maxT: Math.round(data.daily.temperature_2m_max[i]),
-                        minT: Math.round(data.daily.temperature_2m_min[i]),
-                        rain: data.daily.precipitation_probability_max[i] || 0,
-                        uv: data.daily.uv_index_max[i] || 0,
-                        sunrise: data.daily.sunrise[i] ? data.daily.sunrise[i].slice(11, 16) : '',
-                        sunset: data.daily.sunset[i] ? data.daily.sunset[i].slice(11, 16) : ''
+                        code: merged.jma.daily.weather_code[i],
+                        maxT: Math.round(merged.jma.daily.temperature_2m_max[i]),
+                        minT: Math.round(merged.jma.daily.temperature_2m_min[i]),
+                        rain: rainProb,
+                        precip: merged.jma.daily.precipitation_sum ? (merged.jma.daily.precipitation_sum[i] || 0) : 0,
+                        uv: (merged.rain && merged.rain.daily && merged.rain.daily.uv_index_max && merged.rain.daily.uv_index_max[i]) ? merged.rain.daily.uv_index_max[i] : 0,
+                        sunrise,
+                        sunset
                     };
                 };
 
-                const getHourly = (data, date) => {
+                const getHourly = (merged, date) => {
                     const hours = [];
+                    if (!merged.jma.hourly || !merged.jma.hourly.time) return hours;
                     for (let h = 7; h <= 23; h++) {
                         const timeStr = `${date}T${String(h).padStart(2,'0')}:00`;
-                        const i = data.hourly.time.indexOf(timeStr);
+                        const i = merged.jma.hourly.time.indexOf(timeStr);
+                        const ri = (merged.rain && merged.rain.hourly && merged.rain.hourly.time) ? merged.rain.hourly.time.indexOf(timeStr) : -1;
                         if (i !== -1) {
                             hours.push({
                                 hour: h,
-                                temp: Math.round(data.hourly.temperature_2m[i]),
-                                feel: Math.round(data.hourly.apparent_temperature[i]),
-                                rain: data.hourly.precipitation_probability[i] || 0,
-                                code: data.hourly.weather_code[i]
+                                temp: Math.round(merged.jma.hourly.temperature_2m[i]),
+                                feel: Math.round(merged.jma.hourly.apparent_temperature[i]),
+                                rain: (ri !== -1 && merged.rain.hourly.precipitation_probability) ? (merged.rain.hourly.precipitation_probability[ri] || 0) : 0,
+                                code: merged.jma.hourly.weather_code[i]
                             });
                         }
                     }
@@ -1969,24 +1994,6 @@
                     </div>
                 `;
 
-                const renderHourly = (hours, id) => {
-                    let html = `<div id="hourly-${id}" class="hidden mt-2 overflow-x-auto no-scrollbar">
-                        <div class="flex gap-2 pb-1">`;
-                    hours.forEach(h => {
-                        const rainColor = h.rain >= 70 ? 'text-blue-600 font-bold' : h.rain >= 40 ? 'text-blue-500' : 'text-slate-400';
-                        html += `
-                            <div class="shrink-0 w-16 text-center bg-white rounded-lg p-2 border border-slate-100 text-xs">
-                                <p class="font-bold text-slate-700 text-sm">${h.hour}:00</p>
-                                <p class="text-xl my-0.5">${weatherIcon(h.code)}</p>
-                                <p class="text-red-500 font-bold text-sm">${h.temp}°</p>
-                                <p class="text-slate-500">體感${h.feel}°</p>
-                                <p class="${rainColor}">☔${h.rain}%</p>
-                            </div>`;
-                    });
-                    html += `</div></div>`;
-                    return html;
-                };
-
                 tripDates.forEach(trip => {
                     const el = document.getElementById(`weather-day-${trip.day}`);
                     if (!el) return;
@@ -2011,14 +2018,62 @@
                         const w2 = getDaily(kixData, trip.date);
                         if (w2) html += renderWeatherRow(w2, '關西機場');
                     }
+                    if (trip.city2 === '大阪') {
+                        const w2 = getDaily(osakaData, trip.date);
+                        if (w2) html += renderWeatherRow(w2, '大阪');
+                    }
 
+                    // 每小時天氣（雙城市的話顯示兩排）
                     html += `<button onclick="document.getElementById('hourly-${hourlyId}').classList.toggle('hidden')" class="text-xs text-sky-600 mt-1 hover:underline"><i class="fas fa-clock mr-1"></i>顯示每小時天氣</button>`;
-                    html += renderHourly(hours, hourlyId);
+                    
+                    let hourlyHtml = `<div id="hourly-${hourlyId}" class="hidden mt-2 space-y-2">`;
+                    // 主城市
+                    hourlyHtml += `<p class="text-xs text-slate-500 font-bold">${trip.city}</p>`;
+                    hourlyHtml += `<div class="overflow-x-auto no-scrollbar"><div class="flex gap-2 pb-1">`;
+                    hours.forEach(h => {
+                        const rainColor = h.rain >= 70 ? 'text-blue-600 font-bold' : h.rain >= 40 ? 'text-blue-500' : 'text-slate-400';
+                        hourlyHtml += `
+                            <div class="shrink-0 w-16 text-center bg-white rounded-lg p-2 border border-slate-100 text-xs">
+                                <p class="font-bold text-slate-700 text-sm">${h.hour}:00</p>
+                                <p class="text-xl my-0.5">${weatherIcon(h.code)}</p>
+                                <p class="text-red-500 font-bold text-sm">${h.temp}°</p>
+                                <p class="text-slate-500">體感${h.feel}°</p>
+                                <p class="${rainColor}">☔${h.rain}%</p>
+                            </div>`;
+                    });
+                    hourlyHtml += `</div></div>`;
+
+                    // 第二城市
+                    if (trip.city2) {
+                        let secondData;
+                        if (trip.city2 === '京都') secondData = kyotoData;
+                        else if (trip.city2 === '關西機場') secondData = kixData;
+                        else if (trip.city2 === '大阪') secondData = osakaData;
+                        if (secondData) {
+                            const hours2 = getHourly(secondData, trip.date);
+                            hourlyHtml += `<p class="text-xs text-slate-500 font-bold mt-2">${trip.city2}</p>`;
+                            hourlyHtml += `<div class="overflow-x-auto no-scrollbar"><div class="flex gap-2 pb-1">`;
+                            hours2.forEach(h => {
+                                const rainColor = h.rain >= 70 ? 'text-blue-600 font-bold' : h.rain >= 40 ? 'text-blue-500' : 'text-slate-400';
+                                hourlyHtml += `
+                                    <div class="shrink-0 w-16 text-center bg-white rounded-lg p-2 border border-slate-100 text-xs">
+                                        <p class="font-bold text-slate-700 text-sm">${h.hour}:00</p>
+                                        <p class="text-xl my-0.5">${weatherIcon(h.code)}</p>
+                                        <p class="text-red-500 font-bold text-sm">${h.temp}°</p>
+                                        <p class="text-slate-500">體感${h.feel}°</p>
+                                        <p class="${rainColor}">☔${h.rain}%</p>
+                                    </div>`;
+                            });
+                            hourlyHtml += `</div></div>`;
+                        }
+                    }
+                    hourlyHtml += `</div>`;
+                    html += hourlyHtml;
 
                     el.innerHTML = `<div class="space-y-1">${html}</div>`;
                 });
             } catch (e) {
-                // 失敗時靜默不顯示
+                console.error('Weather fetch error:', e);
             }
         }
     </script>
