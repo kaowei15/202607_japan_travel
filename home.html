@@ -926,6 +926,19 @@
                                     <input type="number" id="pp-cash-rate" min="0" step="0.0001" inputmode="decimal" value="0.1985" class="w-full min-w-0 px-3 py-2 rounded-lg border border-slate-300 bg-white" oninput="calcPayPayCompare()">
                                 </label>
                             </div>
+                            <!-- 掃一夏活動開關 -->
+                            <div class="flex items-center gap-3 mt-3 bg-pink-50 rounded-lg px-3 py-2 border border-pink-100">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="pp-summer-toggle" class="sr-only peer" onchange="calcPayPayCompare()">
+                                    <div class="w-9 h-5 bg-slate-300 peer-checked:bg-pink-500 rounded-full transition-colors after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
+                                </label>
+                                <span class="text-sm font-medium text-pink-800">掃一夏折抵（7/1~9/30）</span>
+                                <select id="pp-summer-rate" class="px-2 py-1 rounded border border-pink-200 text-sm bg-white" onchange="calcPayPayCompare()">
+                                    <option value="0.005" selected>0.5%</option>
+                                    <option value="0.10">10%</option>
+                                    <option value="1.00">100%</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -987,6 +1000,48 @@
                             </div>
                             <p class="text-sm font-bold text-emerald-700 break-words" id="pp-recommend">—</p>
                             <p class="text-xs text-slate-500 break-words" id="pp-note">—</p>
+                        </div>
+
+                        <!-- PayPay 掃一夏活動 -->
+                        <div class="mt-4 border-t border-sky-200 pt-4">
+                            <button onclick="document.getElementById('paypay-summer-campaign').classList.toggle('hidden')" class="flex items-center gap-2 text-sm font-bold text-pink-700 hover:text-pink-900 transition-colors">
+                                <i class="fas fa-gift"></i> PayPay 掃一夏：每筆抽折抵＋10倍購物金（7/1~9/30）
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <div id="paypay-summer-campaign" class="hidden mt-3 space-y-3 text-sm">
+                                <!-- 活動一 -->
+                                <div class="bg-pink-50 rounded-lg p-3 border border-pink-100">
+                                    <h5 class="font-bold text-pink-800 mb-2">🎰 活動一：每筆消費立即折抵</h5>
+                                    <p class="text-slate-700 mb-2">用玉山 Wallet 在日本 PayPay 付款，付完立即揭曉折抵比例：</p>
+                                    <div class="flex gap-2 mb-2">
+                                        <span class="px-2 py-1 rounded bg-red-100 text-red-700 font-bold text-xs">100%</span>
+                                        <span class="px-2 py-1 rounded bg-orange-100 text-orange-700 font-bold text-xs">10%</span>
+                                        <span class="px-2 py-1 rounded bg-slate-100 text-slate-700 font-bold text-xs">0.5%</span>
+                                    </div>
+                                    <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside">
+                                        <li>折抵以<b>日圓</b>計算，四捨五入至整數（最小 1 日圓）</li>
+                                        <li>單筆折抵上限 <b>10,000 日圓</b></li>
+                                        <li>台幣實付 = round(結帳日圓 × 匯率) - round(折抵日圓 × 匯率)</li>
+                                        <li>⚠️ 兩次獨立四捨五入，小金額 0.5% 折抵可能被 round 成 0</li>
+                                    </ul>
+                                </div>
+                                <!-- 活動二 -->
+                                <div class="bg-amber-50 rounded-lg p-3 border border-amber-100">
+                                    <h5 class="font-bold text-amber-800 mb-2">🎁 活動二：抽 10 倍日本購物金（每月 100 萬日圓）</h5>
+                                    <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside">
+                                        <li>需先領「10 倍日本購物金抽獎券」</li>
+                                        <li>每筆交易自動參加，中獎金額 = 實付日圓 × 10</li>
+                                        <li>每月累積達 100 萬日圓時停止抽出</li>
+                                        <li>購物金使用：付款時選「樂享券」→「10倍日本購物金」折抵</li>
+                                        <li>使用期限至 2027/9/30</li>
+                                    </ul>
+                                </div>
+                                <!-- 注意事項 -->
+                                <div class="text-xs text-slate-500 space-y-1">
+                                    <p>⚠️「PayPay Money Only」商店（金券店、票務店等）不適用</p>
+                                    <p>⚠️ 退款時折抵金額會被扣回</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -1676,6 +1731,13 @@
         function calcPayPayCompare() {
             const jpyNum = Math.max(0, parseFloat(document.getElementById('pp-jpy')?.value) || 0);
             const cashRate = Math.max(0, parseFloat(document.getElementById('pp-cash-rate')?.value) || 0);
+            
+            // 掃一夏活動
+            const summerOn = document.getElementById('pp-summer-toggle')?.checked || false;
+            const summerRate = parseFloat(document.getElementById('pp-summer-rate')?.value) || 0;
+            const discountJpy = summerOn ? Math.round(jpyNum * summerRate) : 0;
+            const actualJpy = jpyNum - discountJpy;
+
             const fixedConfig = {
                 a: { name: '玉山', rewardPct: 0.035, cap: 100, roundDownInteger: false },
                 b: { name: '台新', rewardPct: 0.038, cap: 0, roundDownInteger: true }
@@ -1687,7 +1749,13 @@
                 const rate = Math.max(0, parseFloat(document.getElementById(`pp-${prefix}-rate`)?.value) || 0);
                 const rewardPct = cfg.rewardPct;
                 const cap = cfg.cap;
-                const twd = Math.round(jpyNum * rate);
+                
+                // 掃一夏活動只有玉山（a）有
+                const hasSummer = summerOn && prefix === 'a';
+                const twdFull = Math.round(jpyNum * rate);
+                const twdDiscount = hasSummer ? Math.round(discountJpy * rate) : 0;
+                const twd = twdFull - twdDiscount;
+                
                 let rawReward = twd * rewardPct;
                 if (cfg.roundDownInteger) {
                     rawReward = Math.floor(rawReward);
@@ -1695,7 +1763,7 @@
                 const reward = cap > 0 ? Math.min(rawReward, cap) : rawReward;
                 const cost = twd - reward;
                 const capApplied = cap > 0 && rawReward > cap + 1e-9;
-                return { name, twd, reward, cost, capApplied };
+                return { name, twd, twdFull, twdDiscount, reward, cost, capApplied, hasSummer };
             };
 
             const a = getCard('a');
@@ -1708,7 +1776,7 @@
 
             document.getElementById('pp-head-a').textContent = a.name;
             document.getElementById('pp-head-b').textContent = b.name;
-            document.getElementById('pp-a-twd').textContent = fmt(a.twd);
+            document.getElementById('pp-a-twd').textContent = fmt(a.twd) + (a.hasSummer ? ` (折$${a.twdDiscount})` : '');
             document.getElementById('pp-b-twd').textContent = fmt(b.twd);
             document.getElementById('pp-a-cb').textContent = fmt(a.reward);
             document.getElementById('pp-b-cb').textContent = fmt(b.reward);
@@ -1729,6 +1797,7 @@
             const noteParts = [];
             if (a.capApplied) noteParts.push(`${a.name} 已觸發回饋上限`);
             if (b.capApplied) noteParts.push(`${b.name} 已觸發回饋上限`);
+            if (summerOn) noteParts.push(`掃一夏折抵 ${(summerRate*100).toFixed(1)}%＝¥${discountJpy}`);
             noteParts.push('台新回饋採無條件捨去到整數，玉山不捨去');
             document.getElementById('pp-note').textContent = noteParts.length > 0
                 ? noteParts.join('；') + '。'
