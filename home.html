@@ -728,6 +728,53 @@
                 </h3>
                 <p class="text-sm text-slate-500 mb-6">玉山熊本熊卡、台新 Richart 並列；熊本熊<strong>加碼 6%</strong>條件與試算如下（匯率請自行輸入）。實際回饋以帳單及銀行公告為準。</p>
                 <div class="space-y-6">
+                    <!-- 速查表（置頂） -->
+                    <div class="bg-violet-50 p-4 rounded-xl border border-violet-100">
+                        <h4 class="font-bold text-violet-800 mb-3 flex items-center">
+                            <i class="fas fa-table mr-2"></i> 什麼時候刷哪張？（速查）
+                        </h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm border-collapse min-w-[280px]">
+                                <thead>
+                                    <tr class="bg-violet-100">
+                                        <th class="border border-violet-200 px-3 py-2 text-left font-semibold text-violet-800">情境</th>
+                                        <th class="border border-violet-200 px-3 py-2 text-left font-semibold text-violet-800">建議</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="border border-violet-200 px-3 py-2 text-slate-700">一般消費，¥16,000 以下</td>
+                                        <td class="border border-violet-200 px-3 py-2"><span class="font-bold">玉山 PayPay</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-violet-200 px-3 py-2 text-slate-700">一般消費，¥16,000 以上</td>
+                                        <td class="border border-violet-200 px-3 py-2">未封頂仍玉山 PayPay，封頂後改<span class="font-bold">台新 PayPay</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-violet-200 px-3 py-2 text-slate-700">不能用 PayPay 的場合，¥700 以下</td>
+                                        <td class="border border-violet-200 px-3 py-2">玉山直刷</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-violet-200 px-3 py-2 text-slate-700">不能用 PayPay 的場合，¥700 以上</td>
+                                        <td class="border border-violet-200 px-3 py-2">台新直刷</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-violet-200 px-3 py-2 text-slate-700">玉山指定商店</td>
+                                        <td class="border border-violet-200 px-3 py-2">玉山直刷</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- 其他優惠 -->
+                        <div class="mt-4 pt-3 border-t border-violet-200">
+                            <h5 class="font-bold text-violet-700 text-sm mb-2"><i class="fas fa-gift mr-1"></i> 其他優惠</h5>
+                            <ul class="text-sm text-slate-700 space-y-2">
+                                <li>🏪 <span class="font-medium">唐吉訶德：</span>消費滿 ¥20,000 回饋 30%，最高 ¥6,000（先確認 JCB 活動登錄狀態）</li>
+                                <li>💳 <span class="font-medium">Mastercard 優惠：</span>單筆消費滿 ¥1,500 可享現金回饋 ¥150（限 1 次，台新卡）</li>
+                            </ul>
+                        </div>
+                    </div>
+
                     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                         <h4 class="font-bold text-violet-700 mb-3 flex items-center text-base">
                             <i class="fas fa-paw mr-2 text-rose-500"></i> 玉山熊本熊卡｜日本加碼 6% 一覽
@@ -741,6 +788,7 @@
                             <li><strong>帳單判讀：</strong>若商店位於百貨、車站美食街等致帳單名稱無法辨識為該店，可能不列入回饋（依活動條款）</li>
                         </ul> -->
                         <p class="text-xs text-slate-500 mb-2">活動期間：2026/7/1～2026/12/31（加碼 6% 每期上限 NT$500，須登錄）</p>
+                        <p class="text-xs text-slate-500 mb-2">💡 以目前匯率計算，加碼 6% 約消費 <span id="kumamon-6pct-cap-jpy" class="font-bold text-violet-700">—</span> 日圓觸頂</p>
                         <p class="text-xs font-bold text-violet-800 mb-2">加碼 6% 適用之指定類型（節錄，完整以官網為準）</p>
                         <p class="text-xs text-violet-700 mb-2">※ 2026/7/1 起新增：Prince Hotel、Budget 租車、人形町今半、Montbell、Alpen</p>
                         <div class="grid sm:grid-cols-2 gap-2 text-xs text-slate-600">
@@ -820,7 +868,7 @@
                                 </label>
                                 <label class="flex flex-col gap-1 text-sm min-w-0">
                                     <span class="font-medium text-slate-700">日幣現鈔匯率 (1 日圓 = 幾元台幣)</span>
-                                    <input type="number" id="bank-cash-rate" min="0" step="0.0001" inputmode="decimal" value="0.1985" class="w-full min-w-0 px-3 py-2 rounded-lg border border-slate-300 bg-white" oninput="calcBankCompare()">
+                                    <input type="number" id="bank-cash-rate" min="0" step="0.0001" inputmode="decimal" value="0.1985" class="w-full min-w-0 px-3 py-2 rounded-lg border border-slate-300 bg-white" oninput="syncCashRate(this.value); calcBankCompare()">
                                 </label>
                             </div>
                         </div>
@@ -830,8 +878,7 @@
                                 <p class="font-semibold text-emerald-800">玉山</p>
                                 <label class="flex flex-col gap-1 text-sm">
                                     <span class="text-slate-600">匯率 (1 日圓 = 幾元台幣)</span>
-                                    <input type="number" id="bank-a-rate" min="0" step="0.0001" inputmode="decimal" value="0.1985
-                                    " class="w-full min-w-0 px-3 py-2 rounded-lg border border-slate-300" oninput="calcBankCompare()">
+                                    <input type="number" id="bank-a-rate" min="0" step="0.0001" inputmode="decimal" value="0.198" class="w-full min-w-0 px-3 py-2 rounded-lg border border-slate-300" oninput="calcBankCompare()">
                                 </label>
                                 <p class="text-sm text-slate-700"><span class="font-medium">回饋：</span>2.5%</p>
                                 <p class="text-sm text-slate-700"><span class="font-medium">海外手續費：</span>1.5%</p>
@@ -841,7 +888,7 @@
                                 <p class="font-semibold text-teal-800">台新</p>
                                 <label class="flex flex-col gap-1 text-sm">
                                     <span class="text-slate-600">匯率 (1 日圓 = 幾元台幣)</span>
-                                    <input type="number" id="bank-b-rate" min="0" step="0.0001" inputmode="decimal" value="0.1982" class="w-full min-w-0 px-3 py-2 rounded-lg border border-slate-300" oninput="calcBankCompare()">
+                                    <input type="number" id="bank-b-rate" min="0" step="0.0001" inputmode="decimal" value="0.1999" class="w-full min-w-0 px-3 py-2 rounded-lg border border-slate-300" oninput="calcBankCompare()">
                                 </label>
                                 <p class="text-sm text-slate-700"><span class="font-medium">回饋：</span>3.3%（無條件捨去到整數）</p>
                                 <p class="text-sm text-slate-700"><span class="font-medium">海外手續費：</span>1.5%</p>
@@ -923,7 +970,7 @@
                                 </label>
                                 <label class="flex flex-col gap-1 text-sm min-w-0">
                                     <span class="font-medium text-slate-700">日幣現鈔匯率 (1 日圓 = 幾元台幣)</span>
-                                    <input type="number" id="pp-cash-rate" min="0" step="0.0001" inputmode="decimal" value="0.1985" class="w-full min-w-0 px-3 py-2 rounded-lg border border-slate-300 bg-white" oninput="calcPayPayCompare()">
+                                    <input type="number" id="pp-cash-rate" min="0" step="0.0001" inputmode="decimal" value="0.1985" class="w-full min-w-0 px-3 py-2 rounded-lg border border-slate-300 bg-white" oninput="syncCashRate(this.value); calcPayPayCompare()">
                                 </label>
                             </div>
                             <!-- 掃一夏活動開關 -->
@@ -1045,44 +1092,6 @@
                         </div>
                     </div>
 
-                    <div class="bg-violet-50 p-4 rounded-xl border border-violet-100">
-                        <h4 class="font-bold text-violet-800 mb-3 flex items-center">
-                            <i class="fas fa-table mr-2"></i> 什麼時候刷哪張？（速查）
-                        </h4>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm border-collapse min-w-[280px]">
-                                <thead>
-                                    <tr class="bg-violet-100">
-                                        <th class="border border-violet-200 px-3 py-2 text-left font-semibold text-violet-800">消費情境</th>
-                                        <th class="border border-violet-200 px-3 py-2 text-left font-semibold text-violet-800">建議卡片</th>
-                                        <th class="border border-violet-200 px-3 py-2 text-left font-semibold text-violet-800">回饋／備註</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="border border-violet-200 px-3 py-2 text-slate-700">日本「指定店」名單內</td>
-                                        <td class="border border-violet-200 px-3 py-2">熊本熊</td>
-                                        <td class="border border-violet-200 px-3 py-2 text-xs">最高約 8.5%（2.5%+6%）；加碼每期上限 500 元</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="border border-violet-200 px-3 py-2 text-slate-700">日本一般（非指定店）</td>
-                                        <td class="border border-violet-200 px-3 py-2">熊本熊</td>
-                                        <td class="border border-violet-200 px-3 py-2 text-xs">2.5% 無上限；另計 1.5% 海外費</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="border border-violet-200 px-3 py-2 text-slate-700">海外／玩旅刷條件達成</td>
-                                        <td class="border border-violet-200 px-3 py-2">Richart</td>
-                                        <td class="border border-violet-200 px-3 py-2 text-xs">依台新「玩旅刷」與當期公告（如基礎 3.3%、加碼後最高等）；請對照官網</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="border border-violet-200 px-3 py-2 text-slate-700">台灣一般／LINE Pay 等</td>
-                                        <td class="border border-violet-200 px-3 py-2">Richart</td>
-                                        <td class="border border-violet-200 px-3 py-2 text-xs">依 Richart 2026 權益（國內／電支條件各自不同）</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
                     <div class="grid md:grid-cols-2 gap-4">
                         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                             <h4 class="font-bold text-violet-700 mb-2 flex items-center text-sm">
@@ -1659,6 +1668,12 @@
             } else {
                 capNote.textContent = '「僅日本一般」不含指定店加碼 6%。';
             }
+            // 更新 6% 加碼觸頂日圓金額
+            const capJpyEl = document.getElementById('kumamon-6pct-cap-jpy');
+            if (capJpyEl && rateNum > 0) {
+                const capJpy = Math.ceil(500 / (rateNum * 0.06));
+                capJpyEl.textContent = '¥' + capJpy.toLocaleString();
+            }
         }
 
         function syncSharedJpy(sourceId) {
@@ -1669,6 +1684,15 @@
             const value = sourceEl.value;
             if (bankEl.value !== value) bankEl.value = value;
             if (ppEl.value !== value) ppEl.value = value;
+            calcBankCompare();
+            calcPayPayCompare();
+        }
+
+        function syncCashRate(value) {
+            const bankCashEl = document.getElementById('bank-cash-rate');
+            const ppCashEl = document.getElementById('pp-cash-rate');
+            if (bankCashEl && bankCashEl.value !== value) bankCashEl.value = value;
+            if (ppCashEl && ppCashEl.value !== value) ppCashEl.value = value;
             calcBankCompare();
             calcPayPayCompare();
         }
@@ -1795,13 +1819,18 @@
             }
 
             const noteParts = [];
-            if (a.capApplied) noteParts.push(`${a.name} 已觸發回饋上限`);
+            if (a.capApplied) {
+                const aRate = Math.max(0, parseFloat(document.getElementById('pp-a-rate')?.value) || 0);
+                const capJpy = aRate > 0 ? Math.ceil(100 / (aRate * 0.035)) : 0;
+                noteParts.push(`${a.name} 已觸發回饋上限（約 ¥${capJpy.toLocaleString()} 以上觸頂）`);
+            }
             if (b.capApplied) noteParts.push(`${b.name} 已觸發回饋上限`);
             if (summerOn) noteParts.push(`掃一夏折抵 ${(summerRate*100).toFixed(1)}%＝¥${discountJpy}`);
             noteParts.push('台新回饋採無條件捨去到整數，玉山不捨去');
-            document.getElementById('pp-note').textContent = noteParts.length > 0
-                ? noteParts.join('；') + '。'
-                : '目前兩卡皆未觸發回饋上限。';
+            const aRate = Math.max(0, parseFloat(document.getElementById('pp-a-rate')?.value) || 0);
+            const capJpyRef = aRate > 0 ? Math.ceil(100 / (aRate * 0.035)) : 0;
+            if (capJpyRef > 0 && !a.capApplied) noteParts.push(`玉山回饋上限 NT$100，約 ¥${capJpyRef.toLocaleString()} 觸頂`);
+            document.getElementById('pp-note').textContent = noteParts.join('；') + '。';
         }
 
         async function fetchJpyToTwdRate() {
