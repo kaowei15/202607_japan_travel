@@ -1863,7 +1863,7 @@
                 { date: '2026-07-21', day: 4, city: '大阪', lat: 34.6937, lon: 135.5023 },
                 { date: '2026-07-22', day: 5, city: '大阪', lat: 34.6937, lon: 135.5023, city2: '京都', lat2: 34.9856, lon2: 135.7682 },
                 { date: '2026-07-23', day: 6, city: '京都', lat: 34.9856, lon: 135.7682 },
-                { date: '2026-07-24', day: 7, city: '京都/宇治', lat: 34.9856, lon: 135.7682 },
+                { date: '2026-07-24', day: 7, city: '京都', lat: 34.9856, lon: 135.7682 },
                 { date: '2026-07-25', day: 8, city: '京都', lat: 34.9856, lon: 135.7682 },
                 { date: '2026-07-26', day: 9, city: '京都', lat: 34.9856, lon: 135.7682, city2: '關西機場', lat2: 34.4320, lon2: 135.2304 }
             ];
@@ -1897,66 +1897,123 @@
             try {
                 const startDate = tripDates[0].date;
                 const endDate = tripDates[tripDates.length - 1].date;
+                const dailyParams = 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max,sunrise,sunset';
+                const hourlyParams = 'temperature_2m,precipitation_probability,weather_code,apparent_temperature';
                 
-                // 抓大阪天氣
-                const osakaUrl = `https://api.open-meteo.com/v1/forecast?latitude=34.6937&longitude=135.5023&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia/Tokyo&start_date=${startDate}&end_date=${endDate}`;
-                // 抓京都天氣
-                const kyotoUrl = `https://api.open-meteo.com/v1/forecast?latitude=34.9856&longitude=135.7682&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia/Tokyo&start_date=${startDate}&end_date=${endDate}`;
-                // 抓關西機場天氣
-                const kixUrl = `https://api.open-meteo.com/v1/forecast?latitude=34.4320&longitude=135.2304&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia/Tokyo&start_date=${startDate}&end_date=${endDate}`;
+                const buildUrl = (lat, lon) => `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=${dailyParams}&hourly=${hourlyParams}&timezone=Asia/Tokyo&start_date=${startDate}&end_date=${endDate}`;
 
-                const [osakaRes, kyotoRes, kixRes] = await Promise.all([fetch(osakaUrl), fetch(kyotoUrl), fetch(kixUrl)]);
-                const [osakaData, kyotoData, kixData] = await Promise.all([osakaRes.json(), kyotoRes.json(), kixRes.json()]);
+                const urls = [
+                    buildUrl(34.6937, 135.5023),  // 大阪
+                    buildUrl(34.9856, 135.7682),  // 京都
+                    buildUrl(34.4320, 135.2304),  // 關西機場
+                    buildUrl(34.6851, 135.8048)   // 奈良
+                ];
+
+                const [osakaData, kyotoData, kixData, naraData] = await Promise.all(
+                    urls.map(u => fetch(u).then(r => r.json()))
+                );
 
                 if (!osakaData.daily || !osakaData.daily.time || osakaData.daily.time.length === 0) return;
 
-                const getWeatherByDate = (data, date) => {
+                const getDaily = (data, date) => {
                     const i = data.daily.time.indexOf(date);
                     if (i === -1) return null;
                     return {
                         code: data.daily.weather_code[i],
                         maxT: Math.round(data.daily.temperature_2m_max[i]),
                         minT: Math.round(data.daily.temperature_2m_min[i]),
-                        rain: data.daily.precipitation_probability_max[i] || 0
+                        rain: data.daily.precipitation_probability_max[i] || 0,
+                        uv: data.daily.uv_index_max[i] || 0,
+                        sunrise: data.daily.sunrise[i] ? data.daily.sunrise[i].slice(11, 16) : '',
+                        sunset: data.daily.sunset[i] ? data.daily.sunset[i].slice(11, 16) : ''
                     };
                 };
 
+                const getHourly = (data, date) => {
+                    const hours = [];
+                    for (let h = 7; h <= 23; h++) {
+                        const timeStr = `${date}T${String(h).padStart(2,'0')}:00`;
+                        const i = data.hourly.time.indexOf(timeStr);
+                        if (i !== -1) {
+                            hours.push({
+                                hour: h,
+                                temp: Math.round(data.hourly.temperature_2m[i]),
+                                feel: Math.round(data.hourly.apparent_temperature[i]),
+                                rain: data.hourly.precipitation_probability[i] || 0,
+                                code: data.hourly.weather_code[i]
+                            });
+                        }
+                    }
+                    return hours;
+                };
+
+                const uvLevel = (uv) => {
+                    if (uv >= 11) return '<span class="text-purple-600 font-bold">危險</span>';
+                    if (uv >= 8) return '<span class="text-red-600 font-bold">非常高</span>';
+                    if (uv >= 6) return '<span class="text-orange-600 font-bold">高</span>';
+                    if (uv >= 3) return '<span class="text-yellow-600">中等</span>';
+                    return '<span class="text-green-600">低</span>';
+                };
+
                 const renderWeatherRow = (w, city) => `
-                    <div class="flex items-center gap-3 bg-gradient-to-r from-sky-50 to-blue-50 rounded-lg px-3 py-2 border border-sky-100 text-sm">
-                        <span class="text-2xl">${weatherIcon(w.code)}</span>
-                        <span class="text-slate-600">${weatherText(w.code)}</span>
-                        <span class="text-red-500 font-bold">${w.maxT}°</span>
+                    <div class="flex items-center gap-3 flex-wrap bg-gradient-to-r from-sky-50 to-blue-50 rounded-lg px-4 py-3 border border-sky-100 text-base">
+                        <span class="text-3xl">${weatherIcon(w.code)}</span>
+                        <span class="text-slate-700 font-medium">${weatherText(w.code)}</span>
+                        <span class="text-red-500 font-bold text-lg">${w.maxT}°</span>
                         <span class="text-slate-400">/</span>
-                        <span class="text-blue-500 font-bold">${w.minT}°</span>
-                        <span class="text-slate-400 text-xs">☔${w.rain}%</span>
-                        <span class="text-xs text-slate-400 ml-auto">${city}</span>
+                        <span class="text-blue-500 font-bold text-lg">${w.minT}°</span>
+                        <span class="text-slate-500 text-sm">☔${w.rain}%</span>
+                        <span class="text-sm text-slate-500">UV${w.uv.toFixed(1)} ${uvLevel(w.uv)}</span>
+                        <span class="text-sm text-slate-400">🌅${w.sunrise} 🌇${w.sunset}</span>
+                        <span class="text-sm text-slate-400 ml-auto">${city}</span>
                     </div>
                 `;
+
+                const renderHourly = (hours, id) => {
+                    let html = `<div id="hourly-${id}" class="hidden mt-2 overflow-x-auto no-scrollbar">
+                        <div class="flex gap-2 pb-1">`;
+                    hours.forEach(h => {
+                        const rainColor = h.rain >= 70 ? 'text-blue-600 font-bold' : h.rain >= 40 ? 'text-blue-500' : 'text-slate-400';
+                        html += `
+                            <div class="shrink-0 w-16 text-center bg-white rounded-lg p-2 border border-slate-100 text-xs">
+                                <p class="font-bold text-slate-700 text-sm">${h.hour}:00</p>
+                                <p class="text-xl my-0.5">${weatherIcon(h.code)}</p>
+                                <p class="text-red-500 font-bold text-sm">${h.temp}°</p>
+                                <p class="text-slate-500">體感${h.feel}°</p>
+                                <p class="${rainColor}">☔${h.rain}%</p>
+                            </div>`;
+                    });
+                    html += `</div></div>`;
+                    return html;
+                };
 
                 tripDates.forEach(trip => {
                     const el = document.getElementById(`weather-day-${trip.day}`);
                     if (!el) return;
 
-                    // 判斷用哪個資料源
                     let primaryData = osakaData;
                     if (trip.lat === 34.9856) primaryData = kyotoData;
-                    if (trip.lat === 34.6851) primaryData = osakaData; // 奈良用大阪（距離近）
+                    if (trip.lat === 34.6851) primaryData = naraData;
 
-                    const w = getWeatherByDate(primaryData, trip.date);
+                    const w = getDaily(primaryData, trip.date);
                     if (!w) return;
+
+                    const hours = getHourly(primaryData, trip.date);
+                    const hourlyId = `day${trip.day}`;
 
                     let html = renderWeatherRow(w, trip.city);
 
-                    // Day 5: 加京都天氣
                     if (trip.city2 === '京都') {
-                        const w2 = getWeatherByDate(kyotoData, trip.date);
+                        const w2 = getDaily(kyotoData, trip.date);
                         if (w2) html += renderWeatherRow(w2, '京都');
                     }
-                    // Day 9: 加關西機場天氣
                     if (trip.city2 === '關西機場') {
-                        const w2 = getWeatherByDate(kixData, trip.date);
+                        const w2 = getDaily(kixData, trip.date);
                         if (w2) html += renderWeatherRow(w2, '關西機場');
                     }
+
+                    html += `<button onclick="document.getElementById('hourly-${hourlyId}').classList.toggle('hidden')" class="text-xs text-sky-600 mt-1 hover:underline"><i class="fas fa-clock mr-1"></i>顯示每小時天氣</button>`;
+                    html += renderHourly(hours, hourlyId);
 
                     el.innerHTML = `<div class="space-y-1">${html}</div>`;
                 });
