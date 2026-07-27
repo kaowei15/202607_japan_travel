@@ -1221,9 +1221,14 @@
 
             <!-- 代購清單主分頁 -->
             <div id="main-tab-shopping" class="main-tab-content">
-                <h3 class="text-xl font-bold text-pink-600 mb-6 flex items-center">
-                    <i class="fas fa-shopping-bag mr-2"></i> 代購清單
-                </h3>
+                <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+                    <h3 class="text-xl font-bold text-pink-600 flex items-center">
+                        <i class="fas fa-shopping-bag mr-2"></i> 代購清單
+                    </h3>
+                    <a href="202607JP-expense.html" class="px-4 py-2 rounded-lg bg-emerald-500 text-white font-bold text-sm hover:bg-emerald-600 transition-all">
+                        <i class="fas fa-calculator mr-1"></i> 開啟記帳本
+                    </a>
+                </div>
                 <p class="text-sm text-slate-500 mb-4">統計需要幫別人帶的東西，勾選已買到的品項。</p>
 
                 <!-- 新增／修改品項表單 -->
@@ -1252,6 +1257,9 @@
                         </button>
                         <button id="shop-cancel-edit" onclick="cancelEditShopping()" class="hidden px-5 py-2 bg-slate-200 text-slate-700 rounded-lg font-bold text-sm hover:bg-slate-300 transition-all">
                             取消
+                        </button>
+                        <button id="shop-delete-btn" onclick="deleteShoppingItem()" class="hidden px-5 py-2 bg-red-500 text-white rounded-lg font-bold text-sm hover:bg-red-600 transition-all">
+                            <i class="fas fa-trash-alt mr-1"></i> 刪除
                         </button>
                     </div>
                 </div>
@@ -1554,6 +1562,7 @@
             document.getElementById('shop-form-title').innerHTML = '<i class="fas fa-plus-circle mr-1"></i> 新增品項';
             document.getElementById('shop-submit-btn').innerHTML = '<i class="fas fa-plus mr-1"></i> 新增品項';
             document.getElementById('shop-cancel-edit').classList.add('hidden');
+            document.getElementById('shop-delete-btn').classList.add('hidden');
         }
 
         function editShoppingItem(key, event) {
@@ -1572,12 +1581,29 @@
                 document.getElementById('shop-form-title').innerHTML = '<i class="fas fa-pen mr-1"></i> 修改品項';
                 document.getElementById('shop-submit-btn').innerHTML = '<i class="fas fa-save mr-1"></i> 儲存修改';
                 document.getElementById('shop-cancel-edit').classList.remove('hidden');
+                document.getElementById('shop-delete-btn').classList.remove('hidden');
                 document.getElementById('shop-form-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
         }
 
         function cancelEditShopping() {
             resetShoppingForm();
+        }
+
+        // 刪除代購品項
+        function deleteShoppingItem() {
+            const editKey = document.getElementById('shop-edit-key').value;
+            if (!editKey) return;
+            
+            if (confirm('確定要刪除這個品項嗎？')) {
+                itemsRef.child(editKey).remove()
+                    .then(() => {
+                        resetShoppingForm();
+                    })
+                    .catch(err => {
+                        alert('刪除失敗：' + err.message);
+                    });
+            }
         }
 
         // 勾選（僅 checkbox 觸發，同步到 Firebase）
@@ -1934,8 +1960,15 @@
         
         // 初始化：顯示行程分頁和第一天
         window.addEventListener('DOMContentLoaded', function() {
-            showMainTab('itinerary');
-            showDayTab(1);
+            // 檢查是否從記帳頁面返回，需要顯示代購分頁
+            const savedTab = localStorage.getItem('jp2026_tab');
+            if (savedTab) {
+                localStorage.removeItem('jp2026_tab');
+                showMainTab(savedTab);
+            } else {
+                showMainTab('itinerary');
+                showDayTab(1);
+            }
             calcKumamonCashback();
             calcBankCompare();
             calcPayPayCompare();
