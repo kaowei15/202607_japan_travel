@@ -1264,6 +1264,14 @@
                     </div>
                 </div>
 
+                <!-- 搜尋框 -->
+                <div class="relative mb-4">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="shop-search" placeholder="搜尋委託人、品項、備註..." 
+                        oninput="filterShoppingWithSearch()"
+                        class="w-full pl-10 pr-4 py-2 border border-pink-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-400">
+                </div>
+
                 <!-- 分類篩選 -->
                 <div class="flex flex-wrap gap-2 mb-4">
                     <button onclick="filterShopping('all')" class="shop-filter-btn px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-bold transition-all ring-2 ring-pink-400" data-filter="all">全部</button>
@@ -1483,22 +1491,24 @@
                     : '';
 
                 tbody.innerHTML += `
-                    <tr class="border-b border-slate-100 hover:bg-slate-50 shop-item ${rowClass}" data-category="${item.category}" data-key="${key}" style="${display}">
-                        <td class="py-2 px-3"><input type="checkbox" class="w-4 h-4 rounded border-slate-300 cursor-pointer" ${checked} onchange="toggleShoppingCheckByKey('${key}', this)"></td>
+                    <tr class="border-b border-slate-100 hover:bg-slate-50 shop-item ${rowClass} cursor-pointer" data-category="${item.category}" data-key="${key}" style="${display}" onclick="toggleShoppingCheckByKey('${key}', this.querySelector('input[type=checkbox]'))">
+                        <td class="py-2 px-3" onclick="event.stopPropagation()"><input type="checkbox" class="w-4 h-4 rounded border-slate-300 cursor-pointer" ${checked} onchange="toggleShoppingCheckByKey('${key}', this); event.stopPropagation();"></td>
                         <td class="py-2 px-3 font-medium">${item.person}</td>
                         <td class="py-2 px-3"><span class="px-2 py-0.5 rounded-full ${colorClass} text-xs">${item.category}</span></td>
                         <td class="py-2 px-3">${item.item}</td>
                         <td class="py-2 px-3">${item.qty}</td>
-                        <td class="py-2 px-3">${imgHtml}</td>
+                        <td class="py-2 px-3" onclick="event.stopPropagation()">${imgHtml}</td>
                         <td class="py-2 px-3 text-slate-500">${item.note || ''}</td>
-                        <td class="py-2 px-3"><button onclick="editShoppingItem('${key}', event)" class="text-blue-500 hover:text-blue-700 text-xs"><i class="fas fa-pen"></i></button></td>
+                        <td class="py-2 px-3" onclick="event.stopPropagation()"><button onclick="editShoppingItem('${key}', event)" class="text-blue-500 hover:text-blue-700 p-1"><i class="fas fa-pen"></i></button></td>
                     </tr>
                 `;
 
                 cards.innerHTML += `
-                    <div class="shop-item border border-slate-200 rounded-lg px-2.5 py-2.5 bg-white ${rowClass}" data-category="${item.category}" data-key="${key}" style="${display}">
+                    <div class="shop-item border border-slate-200 rounded-lg px-2.5 py-2.5 bg-white ${rowClass} cursor-pointer hover:bg-slate-50 transition" data-category="${item.category}" data-key="${key}" style="${display}" onclick="toggleShoppingCheckByRow('${key}', this)">
                         <div class="flex items-start gap-2.5">
-                            <input type="checkbox" class="mt-2 w-5 h-5 shrink-0 rounded border-slate-300 cursor-pointer" ${checked} onchange="toggleShoppingCheckByKey('${key}', this)">
+                            <div onclick="event.stopPropagation()">
+                                <input type="checkbox" class="mt-2 w-5 h-5 shrink-0 rounded border-slate-300 cursor-pointer" ${checked} onchange="toggleShoppingCheckByKey('${key}', this)">
+                            </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-1.5 flex-wrap">
                                     <span class="font-bold text-base text-slate-800">${item.person}</span>
@@ -1508,8 +1518,10 @@
                                 <p class="text-base text-slate-700 leading-snug break-words mt-0.5">${item.item}</p>
                                 ${mobileNoteHtml}
                             </div>
-                            ${mobileImgHtml}
-                            <button onclick="editShoppingItem('${key}', event)" class="shrink-0 p-1.5 text-blue-500 hover:text-blue-700"><i class="fas fa-pen text-sm"></i></button>
+                            <div onclick="event.stopPropagation()">${mobileImgHtml}</div>
+                            <button onclick="event.stopPropagation(); editShoppingItem('${key}', event)" class="shrink-0 p-1.5 text-blue-500 hover:text-blue-700">
+                                <i class="fas fa-pen text-sm"></i>
+                            </button>
                         </div>
                     </div>
                 `;
@@ -1566,31 +1578,79 @@
         }
 
         function editShoppingItem(key, event) {
-            event.stopPropagation();
+            if (event) event.stopPropagation();
             itemsRef.child(key).once('value', (snapshot) => {
                 const data = snapshot.val();
                 if (!data) return;
 
-                document.getElementById('shop-edit-key').value = key;
-                document.getElementById('shop-person').value = data.person || '';
-                document.getElementById('shop-category').value = data.category || '藥妝';
-                document.getElementById('shop-item').value = data.item || '';
-                document.getElementById('shop-qty').value = data.qty || '1';
-                document.getElementById('shop-img-url').value = data.img || '';
-                document.getElementById('shop-note').value = data.note || '';
-                document.getElementById('shop-form-title').innerHTML = '<i class="fas fa-pen mr-1"></i> 修改品項';
-                document.getElementById('shop-submit-btn').innerHTML = '<i class="fas fa-save mr-1"></i> 儲存修改';
-                document.getElementById('shop-cancel-edit').classList.remove('hidden');
-                document.getElementById('shop-delete-btn').classList.remove('hidden');
-                document.getElementById('shop-form-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // 填入彈窗表單
+                document.getElementById('modal-shop-key').value = key;
+                document.getElementById('modal-shop-person').value = data.person || '';
+                document.getElementById('modal-shop-category').value = data.category || '藥妝';
+                document.getElementById('modal-shop-item').value = data.item || '';
+                document.getElementById('modal-shop-qty').value = data.qty || '1';
+                document.getElementById('modal-shop-img').value = data.img || '';
+                document.getElementById('modal-shop-note').value = data.note || '';
+                document.getElementById('modal-shop-checked').checked = data.checked || false;
+                
+                // 顯示彈窗
+                document.getElementById('shopEditModal').classList.remove('hidden');
+                document.getElementById('shopEditModal').classList.add('flex');
             });
+        }
+
+        // 關閉編輯彈窗
+        function closeShopEditModal() {
+            document.getElementById('shopEditModal').classList.add('hidden');
+            document.getElementById('shopEditModal').classList.remove('flex');
+        }
+
+        // 儲存編輯（彈窗）
+        function saveShopEditModal() {
+            const key = document.getElementById('modal-shop-key').value;
+            const person = document.getElementById('modal-shop-person').value.trim();
+            const category = document.getElementById('modal-shop-category').value;
+            const item = document.getElementById('modal-shop-item').value.trim();
+            const qty = document.getElementById('modal-shop-qty').value || '1';
+            const img = document.getElementById('modal-shop-img').value.trim();
+            const note = document.getElementById('modal-shop-note').value.trim();
+            const checked = document.getElementById('modal-shop-checked').checked;
+
+            if (!person || !item) {
+                alert('請至少填寫委託人和品項名稱');
+                return;
+            }
+
+            itemsRef.child(key).update({ person, category, item, qty, img, note, checked })
+                .then(() => {
+                    closeShopEditModal();
+                })
+                .catch(err => {
+                    alert('儲存失敗：' + err.message);
+                });
+        }
+
+        // 刪除（彈窗）
+        function deleteShopEditModal() {
+            const key = document.getElementById('modal-shop-key').value;
+            if (!key) return;
+            
+            if (confirm('確定要刪除這個品項嗎？')) {
+                itemsRef.child(key).remove()
+                    .then(() => {
+                        closeShopEditModal();
+                    })
+                    .catch(err => {
+                        alert('刪除失敗：' + err.message);
+                    });
+            }
         }
 
         function cancelEditShopping() {
             resetShoppingForm();
         }
 
-        // 刪除代購品項
+        // 刪除代購品項（原表單用）
         function deleteShoppingItem() {
             const editKey = document.getElementById('shop-edit-key').value;
             if (!editKey) return;
@@ -1613,22 +1673,55 @@
             }
         }
 
+        // 點擊整條切換勾選狀態（手機版卡片用）
+        function toggleShoppingCheckByRow(key, row) {
+            const checkbox = row.querySelector('input[type=checkbox]');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                toggleShoppingCheckByKey(key, checkbox);
+            }
+        }
+
         // 分類篩選
         function filterShopping(category) {
             currentFilter = category;
-            const items = document.querySelectorAll('.shop-item');
-            items.forEach(item => {
-                if (category === 'all' || item.dataset.category === category) {
-                    item.style.display = '';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
+            filterShoppingWithSearch();
             const btns = document.querySelectorAll('.shop-filter-btn');
             btns.forEach(btn => {
                 btn.classList.remove('ring-2', 'ring-pink-400');
                 if (btn.dataset.filter === category) {
                     btn.classList.add('ring-2', 'ring-pink-400');
+                }
+            });
+        }
+
+        // 搜尋 + 分類篩選
+        function filterShoppingWithSearch() {
+            const searchText = (document.getElementById('shop-search').value || '').toLowerCase();
+            const items = document.querySelectorAll('.shop-item');
+            
+            items.forEach(item => {
+                const category = item.dataset.category;
+                const key = item.dataset.key;
+                
+                // 找到對應的資料
+                const entry = shoppingEntries.find(([k, _]) => k === key);
+                if (!entry) {
+                    item.style.display = 'none';
+                    return;
+                }
+                
+                const data = entry[1];
+                const matchCategory = currentFilter === 'all' || category === currentFilter;
+                
+                // 搜尋文字匹配（委託人、品項、備註）
+                const searchContent = `${data.person || ''} ${data.item || ''} ${data.note || ''}`.toLowerCase();
+                const matchSearch = !searchText || searchContent.includes(searchText);
+                
+                if (matchCategory && matchSearch) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
                 }
             });
         }
@@ -2204,5 +2297,71 @@
             }
         }
     </script>
+
+    <!-- 代購品項編輯彈窗 -->
+    <div id="shopEditModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4" onclick="if(event.target === this) closeShopEditModal()">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between p-4 border-b border-slate-200 sticky top-0 bg-white">
+                <h3 class="font-bold text-lg text-pink-700"><i class="fas fa-pen mr-2"></i>編輯代購品項</h3>
+                <button onclick="closeShopEditModal()" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-4 space-y-3">
+                <input type="hidden" id="modal-shop-key">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs text-slate-500">委託人</label>
+                        <input type="text" id="modal-shop-person" placeholder="委託人" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-500">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-500">分類</label>
+                        <select id="modal-shop-category" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-500">
+                            <option value="藥妝">藥妝</option>
+                            <option value="動漫">動漫</option>
+                            <option value="零食">零食</option>
+                            <option value="衣服">衣服</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-500">品項名稱</label>
+                    <input type="text" id="modal-shop-item" placeholder="品項名稱" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs text-slate-500">數量</label>
+                        <input type="number" id="modal-shop-qty" value="1" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-500">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-500">已購買</label>
+                        <div class="flex items-center h-[42px]">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="modal-shop-checked" class="w-5 h-5 text-pink-500 rounded focus:ring-pink-500">
+                                <span class="text-sm text-slate-600">已勾選</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-500">圖片網址（選填）</label>
+                    <input type="text" id="modal-shop-img" placeholder="https://..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-500">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-500">備註（選填）</label>
+                    <input type="text" id="modal-shop-note" placeholder="備註..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-500">
+                </div>
+            </div>
+            <div class="flex gap-2 p-4 border-t border-slate-200">
+                <button onclick="saveShopEditModal()" class="flex-1 py-2 bg-pink-600 text-white rounded-lg font-bold hover:bg-pink-700 transition">
+                    <i class="fas fa-save mr-1"></i> 儲存
+                </button>
+                <button onclick="deleteShopEditModal()" class="px-4 py-2 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition">
+                    <i class="fas fa-trash-alt mr-1"></i> 刪除
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
