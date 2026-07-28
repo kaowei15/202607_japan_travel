@@ -71,7 +71,7 @@
             <div class="flex flex-wrap items-center justify-between gap-4">
                 <div class="flex items-center gap-2">
                     <span class="text-sm text-slate-600"><i class="fas fa-yen-sign mr-1"></i>匯率設定:</span>
-                    <input type="number" id="exchangeRate" value="0.22" step="0.01" min="0.01" 
+                    <input type="number" id="exchangeRate" value="0.2" step="0.01" min="0.01" 
                         class="w-20 px-2 py-1 border border-slate-300 rounded-lg text-center text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <span class="text-sm text-slate-500">TWD/JPY</span>
                 </div>
@@ -104,19 +104,19 @@
             </div>
 
             <!-- 代購統計 -->
-            <div class="grid grid-cols-3 gap-4 mb-4">
-                <div class="bg-indigo-400/30 backdrop-blur rounded-xl p-3 text-center border border-indigo-300/30">
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-4">
+                <div class="col-span-2 sm:col-span-1 bg-indigo-400/30 backdrop-blur rounded-xl p-3 text-center border border-indigo-300/30">
                     <p class="text-xs opacity-80">代購總金額</p>
-                    <p class="text-xl font-bold text-indigo-100">¥<span id="totalProxy">0</span></p>
+                    <p class="text-lg sm:text-xl font-bold text-indigo-100">¥<span id="totalProxy">0</span></p>
                     <p class="text-xs opacity-70">≈ NT$<span id="totalProxyTWD">0</span></p>
                 </div>
                 <div class="bg-white/20 backdrop-blur rounded-xl p-3 text-center">
                     <p class="text-xs opacity-80">代購已收款</p>
-                    <p class="text-xl font-bold text-emerald-300">NT$<span id="totalProxyPaid">0</span></p>
+                    <p class="text-lg sm:text-xl font-bold text-emerald-300">NT$<span id="totalProxyPaid">0</span></p>
                 </div>
                 <div class="bg-white/20 backdrop-blur rounded-xl p-3 text-center">
                     <p class="text-xs opacity-80">代購待收款</p>
-                    <p class="text-xl font-bold text-amber-300">NT$<span id="totalProxyUnpaid">0</span></p>
+                    <p class="text-lg sm:text-xl font-bold text-amber-300">NT$<span id="totalProxyUnpaid">0</span></p>
                 </div>
             </div>
 
@@ -203,7 +203,7 @@
             <!-- 新增花費表單 -->
             <section class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-4">
                 <h3 class="font-bold text-slate-700 mb-3"><i class="fas fa-plus-circle mr-2 text-indigo-500"></i>新增花費</h3>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     <div>
                         <label class="text-xs text-slate-500">日期</label>
                         <input type="date" id="expenseDate" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
@@ -248,7 +248,7 @@
                         <label class="text-xs text-slate-500">商品名稱</label>
                         <input type="text" id="expenseItem" placeholder="商品..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
-                    <div class="md:col-span-2">
+                    <div class="sm:col-span-2">
                         <label class="text-xs text-slate-500">備註</label>
                         <input type="text" id="expenseNote" placeholder="說明..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
@@ -889,7 +889,7 @@
                 return;
             }
 
-            const rate = parseFloat(document.getElementById('exchangeRate').value) || 0.22;
+            const rate = parseFloat(document.getElementById('exchangeRate').value) || 0.20;
             
             // 排序並轉換資料
             const entries = Object.entries(data).sort((a, b) => {
@@ -1008,24 +1008,28 @@
                     const amountColor = currency === 'JPY' ? 'text-indigo-600' : 'text-teal-600';
                     
                     html += `
-                        <div class="flex items-center gap-2 p-3 bg-slate-50 rounded-xl border-l-4 ${cat.class} hover:bg-slate-100 transition cursor-pointer group" onclick="editExpense('${e.key}')">
-                            <span class="text-2xl w-8 text-center shrink-0">${cat.icon}</span>
-                            <div class="flex-1 min-w-0">
-                                <p class="font-medium text-slate-700 truncate">${itemText}</p>
-                                <div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
-                                    ${noteText ? `<span class="truncate max-w-[80px]">${noteText}</span><span>·</span>` : ''}
-                                    <span class="${pay.class}">${pay.icon} ${pay.name}</span>
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-3 bg-slate-50 rounded-xl border-l-4 ${cat.class} hover:bg-slate-100 transition cursor-pointer group" onclick="editExpense('${e.key}')">
+                            <div class="flex items-center gap-2 flex-1 min-w-0">
+                                <span class="text-2xl w-8 text-center shrink-0">${cat.icon}</span>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-medium text-slate-700">${itemText}</p>
+                                    <div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+                                        ${noteText ? `<span>${noteText}</span><span>·</span>` : ''}
+                                        <span class="${pay.class}">${pay.icon} ${pay.name}</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="shrink-0 w-[90px] text-right">
-                                <p class="font-bold ${amountColor} tabular-nums">${currencySymbol}${e.amount.toLocaleString()}</p>
-                                <p class="text-xs text-slate-400 tabular-nums">${currency === 'TWD' ? '≈ ¥' + jpyAmount.toLocaleString() : '≈ NT$' + twdAmount.toLocaleString()}</p>
-                            </div>
-                            <div class="shrink-0 w-[50px] text-right">
-                                <p class="text-sm text-red-500 tabular-nums font-medium">${fee > 0 ? '(+' + fee + ')' : ''}</p>
-                            </div>
-                            <div class="text-blue-400 opacity-0 group-hover:opacity-100 transition w-6 text-center shrink-0">
-                                <i class="fas fa-pen text-sm"></i>
+                            <div class="flex items-center justify-end gap-2 pl-10 sm:pl-0">
+                                <div class="shrink-0 text-right">
+                                    <p class="font-bold ${amountColor} tabular-nums">${currencySymbol}${e.amount.toLocaleString()}</p>
+                                    <p class="text-xs text-slate-400 tabular-nums">${currency === 'TWD' ? '≈ ¥' + jpyAmount.toLocaleString() : '≈ NT$' + twdAmount.toLocaleString()}</p>
+                                </div>
+                                <div class="shrink-0 w-[50px] text-right">
+                                    <p class="text-sm text-red-500 tabular-nums font-medium">${fee > 0 ? '(+' + fee + ')' : ''}</p>
+                                </div>
+                                <div class="text-blue-400 sm:opacity-0 group-hover:opacity-100 transition w-6 text-center shrink-0">
+                                    <i class="fas fa-pen text-sm"></i>
+                                </div>
                             </div>
                         </div>`;
                 });
@@ -1119,7 +1123,7 @@
                 return;
             }
 
-            const rate = parseFloat(document.getElementById('exchangeRate').value) || 0.22;
+            const rate = parseFloat(document.getElementById('exchangeRate').value) || 0.20;
             const grouped = {};
             
             Object.entries(data).forEach(([key, p]) => {
@@ -1148,18 +1152,22 @@
                     const itemTotal = p.price * p.qty;
                     const chargeAmount = p.charge || Math.round(itemTotal * rate);
                     html += `
-                        <div class="flex items-center gap-3 p-3 bg-white rounded-xl cursor-pointer hover:bg-slate-50 transition" onclick="toggleProxyPaid('${p.key}', ${p.paid})">
-                            <div class="w-6 h-6 rounded border-2 ${p.paid ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'} flex items-center justify-center shrink-0">
-                                ${p.paid ? '<i class="fas fa-check text-sm"></i>' : ''}
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-3 bg-white rounded-xl cursor-pointer hover:bg-slate-50 transition" onclick="toggleProxyPaid('${p.key}', ${p.paid})">
+                            <div class="flex items-center gap-3 flex-1 min-w-0">
+                                <div class="w-6 h-6 rounded border-2 ${p.paid ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'} flex items-center justify-center shrink-0">
+                                    ${p.paid ? '<i class="fas fa-check text-sm"></i>' : ''}
+                                </div>
+                                <span class="flex-1 font-medium ${p.paid ? 'line-through text-slate-400' : 'text-slate-700'}">${p.item} x${p.qty}</span>
                             </div>
-                            <span class="flex-1 font-medium ${p.paid ? 'line-through text-slate-400' : 'text-slate-700'}">${p.item} x${p.qty}</span>
-                            <div class="text-right shrink-0">
-                                <p class="text-indigo-600 font-bold">¥${itemTotal.toLocaleString()}</p>
-                                <p class="text-teal-600 font-bold">NT$${chargeAmount.toLocaleString()}</p>
+                            <div class="flex items-center justify-end gap-3 pl-9 sm:pl-0">
+                                <div class="text-right shrink-0">
+                                    <p class="text-indigo-600 font-bold">¥${itemTotal.toLocaleString()}</p>
+                                    <p class="text-teal-600 font-bold">NT$${chargeAmount.toLocaleString()}</p>
+                                </div>
+                                <button onclick="event.stopPropagation(); editProxy('${p.key}')" class="p-2 text-blue-400 hover:text-blue-600 shrink-0">
+                                    <i class="fas fa-pen"></i>
+                                </button>
                             </div>
-                            <button onclick="event.stopPropagation(); editProxy('${p.key}')" class="p-2 text-blue-400 hover:text-blue-600">
-                                <i class="fas fa-pen"></i>
-                            </button>
                         </div>`;
                 });
                 
@@ -1170,7 +1178,7 @@
 
         // 更新統計
         function updateStats(expensesData, proxyData) {
-            const rate = parseFloat(document.getElementById('exchangeRate').value) || 0.22;
+            const rate = parseFloat(document.getElementById('exchangeRate').value) || 0.2;
             
             // 個人花費統計
             let totalPersonalJPY = 0;  // 日幣原始金額（含手續費）
